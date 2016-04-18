@@ -6,7 +6,7 @@
 
 #include <PropRoom3D/Team/ArtDirector/RaytracerState.h>
 
-#include "ui_RaytracerGui.h"
+#include "ui_ExAnimatorGui.h"
 
 
 CameraManager::CameraManager(Ui::ExAnimatorGui* ui) :

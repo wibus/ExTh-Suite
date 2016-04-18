@@ -10,7 +10,7 @@
 #include "Model/SceneDocument.h"
 #include "Animators/TheFruitChoreographer.h"
 
-#include "ui_RaytracerGui.h"
+#include "ui_ExAnimatorGui.h"
 
 
 TimelineManager::TimelineManager(Ui::ExAnimatorGui* ui) :

@@ -17,7 +17,7 @@
 
 #include <PropRoom3D/Node/StageSet.h>
 
-#include "ui_RaytracerGui.h"
+#include "ui_ExAnimatorGui.h"
 #include "Model/PathModel.h"
 #include "Model/SceneDocument.h"
 #include "Animators/TheFruitChoreographer.h"
