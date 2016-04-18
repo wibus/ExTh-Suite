@@ -25,7 +25,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="serverAddressEdit"/>
+       <widget class="QLineEdit" name="serverAddressEdit">
+        <property name="placeholderText">
+         <string>255.255.255.255</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="portLabel">
@@ -35,7 +39,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="portEdit"/>
+       <widget class="QLineEdit" name="portEdit">
+        <property name="text">
+         <string>8004</string>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
@@ -63,6 +71,9 @@
      <widget class="QScrollArea" name="viewScrollArea">
       <property name="widgetResizable">
        <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
       <widget class="QWidget" name="scrollAreaWidgetContents">
        <property name="geometry">

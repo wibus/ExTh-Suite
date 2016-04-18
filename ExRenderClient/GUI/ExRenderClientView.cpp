@@ -8,6 +8,8 @@
 
 #include <Scaena/Play/Play.h>
 
+using namespace cellar;
+
 
 ExRenderClientView::ExRenderClientView() :
     scaena::QGlWidgetView("Experimental Render Client View")
@@ -19,6 +21,15 @@ ExRenderClientView::~ExRenderClientView()
 
 }
 
+void ExRenderClientView::notify(cellar::CameraMsg& msg)
+{
+    if(msg.change == CameraMsg::EChange::VIEWPORT)
+    {
+        setFixedSize(msg.camera.viewport().x,
+                     msg.camera.viewport().y);
+    }
+}
+
 void ExRenderClientView::installArtDirectors(scaena::Play& play)
 {
     _artDirector2D.reset(new prop2::GlArtDirector());
@@ -28,6 +39,8 @@ void ExRenderClientView::installArtDirectors(scaena::Play& play)
     play.propTeam3D()->addArtDirector(_artDirectorClient);
     _artDirector3D = _artDirectorClient;
 
+    _artDirectorClient->camera()->registerObserver(*this);
+    _artDirectorClient->camera()->updateViewport(800, 600);
 }
 
 void ExRenderClientView::setup()
