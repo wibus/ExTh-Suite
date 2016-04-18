@@ -13,7 +13,7 @@
 #include "ui_RaytracerGui.h"
 
 
-TimelineManager::TimelineManager(Ui::RaytracerGui* ui) :
+TimelineManager::TimelineManager(Ui::ExAnimatorGui* ui) :
     _ui(ui)
 {
     connect(_ui->animTimeOffsetMinSpin, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),

@@ -19,12 +19,14 @@
 
 #include "Model/PathModel.h"
 #include "Model/SceneDocument.h"
-#include "UI/Managers/PathManager.h"
+#include "GUI/Managers/PathManager.h"
 
 using namespace cellar;
 using namespace prop3;
 
+
 const std::string RECORD_OUPUT_PREFIX = "CpuRaytracing/Animations/";
+
 
 void TheFruitChoreographer::update(double dt)
 {

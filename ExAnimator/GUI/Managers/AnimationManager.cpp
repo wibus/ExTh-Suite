@@ -13,7 +13,7 @@
 #include "ui_RaytracerGui.h"
 
 
-AnimationManager::AnimationManager(Ui::RaytracerGui* ui) :
+AnimationManager::AnimationManager(Ui::ExAnimatorGui* ui) :
     _ui(ui)
 {
     connect(_ui->maxSampleSpin, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),

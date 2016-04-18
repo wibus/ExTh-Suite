@@ -3,8 +3,8 @@
 #include <Scaena/ScaenaApplication/Application.h>
 #include <Scaena/ScaenaApplication/QGlWidgetView.h>
 
-#include "ExAnimatorCharacter.h"
-#include "GUI/ExAnimatorGui.h"
+#include "ExRenderClientCharacter.h"
+#include "GUI/ExRenderClientGui.h"
 
 using namespace std;
 using namespace cellar;
@@ -20,13 +20,13 @@ int main(int argc, char* argv[])
 
     // Build the Play
     std::shared_ptr<Play> play(new Play("ExAnimator"));
-    std::shared_ptr<Character> character(new ExAnimatorCharacter());
+    std::shared_ptr<Character> character(new ExRenderClientCharacter());
     std::shared_ptr<Act> act(new Act("Main Act"));
     act->addCharacter(character);
     play->appendAct(act);
 
     // Build GUI
-    ExAnimatorGui* window = new ExAnimatorGui(play);
+    ExRenderClientGui* window = new ExRenderClientGui(play);
     window->show();
 
     app.setPlay(play);

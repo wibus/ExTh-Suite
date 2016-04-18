@@ -9,7 +9,7 @@
 #include "ui_RaytracerGui.h"
 
 
-CameraManager::CameraManager(Ui::RaytracerGui* ui) :
+CameraManager::CameraManager(Ui::ExAnimatorGui* ui) :
     _ui(ui),
     _fullscreenWindow(nullptr)
 {

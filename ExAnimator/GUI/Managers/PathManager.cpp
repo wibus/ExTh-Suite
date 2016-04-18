@@ -45,7 +45,7 @@ public:
                 std::vector<std::function<void(double)>>& durationChangedCallback,
                 std::vector<std::string>& pathParentName,
                 const std::function<void(void)>& refreshCallBack,
-                Ui::RaytracerGui* ui,
+                Ui::ExAnimatorGui* ui,
                 AbstractPath<Data>* path,
                 const std::string& name,
                 double beginTime);
@@ -79,7 +79,7 @@ private:
     std::vector<std::function<void(double)>>& _durationChangedCallback;
     std::vector<std::string>& _pathParentName;
     std::function<void(void)> _refreshCallBack;
-    Ui::RaytracerGui* _ui;
+    Ui::ExAnimatorGui* _ui;
     AbstractPath<Data>* _path;
     std::string _name;
     double _beginTime;
@@ -94,7 +94,7 @@ TreeBuilder<Data>::TreeBuilder(
         std::vector<std::function<void(double)>>& durationChangedCallback,
         std::vector<std::string>& pathParentName,
         const std::function<void(void)>& refreshCallBack,
-        Ui::RaytracerGui* ui,
+        Ui::ExAnimatorGui* ui,
         AbstractPath<Data>* path,
         const std::string& name,
         double beginTime) :
@@ -330,7 +330,7 @@ void TreeBuilder<Data>::visit(CompositePath<Data> &path)
 }
 
 
-PathManager::PathManager(Ui::RaytracerGui* ui) :
+PathManager::PathManager(Ui::ExAnimatorGui* ui) :
     _ui(ui),
     _selectedPathId(-1)
 {

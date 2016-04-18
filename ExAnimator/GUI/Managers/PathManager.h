@@ -13,7 +13,7 @@
 
 namespace Ui
 {
-    class RaytracerGui;
+    class ExAnimatorGui;
 }
 
 namespace prop3
@@ -32,7 +32,7 @@ class PathManager : public QObject
     Q_OBJECT
 
 public:
-    PathManager(Ui::RaytracerGui* ui);
+    PathManager(Ui::ExAnimatorGui* ui);
     virtual ~PathManager();
 
     virtual void setStageSet(
@@ -63,7 +63,7 @@ private slots:
     virtual void loadPaths();
 
 private:
-    Ui::RaytracerGui* _ui;
+    Ui::ExAnimatorGui* _ui;
     QStandardItemModel* _pathTreeModel;
     std::shared_ptr<prop3::StageSet> _stageSet;
     std::shared_ptr<TheFruitChoreographer> _choreographer;

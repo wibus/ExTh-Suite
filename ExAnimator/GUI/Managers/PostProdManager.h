@@ -7,7 +7,7 @@
 
 namespace Ui
 {
-    class RaytracerGui;
+    class ExAnimatorGui;
 }
 
 namespace prop3
@@ -21,7 +21,7 @@ class PostProdManager : public QObject
     Q_OBJECT
 
 public:
-    PostProdManager(Ui::RaytracerGui* ui);
+    PostProdManager(Ui::ExAnimatorGui* ui);
     virtual ~PostProdManager();
 
     virtual void setPostProdUnit(
@@ -49,7 +49,7 @@ private:
 
 
 private:
-    Ui::RaytracerGui* _ui;
+    Ui::ExAnimatorGui* _ui;
     std::shared_ptr<prop3::GlPostProdUnit> _unitBackend;
 };
 

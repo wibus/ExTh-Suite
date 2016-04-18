@@ -1,5 +1,5 @@
-#include "RaytracerGui.h"
-#include "ui_RaytracerGui.h"
+#include "ExAnimatorGui.h"
+#include "ui_ExAnimatorGui.h"
 
 #include <QSpinBox>
 #include <QApplication>
@@ -10,13 +10,13 @@
 #include "Managers/TimelineManager.h"
 #include "Managers/PostProdManager.h"
 #include "Managers/PathManager.h"
-#include "RaytracedView.h"
+#include "ExAnimatorView.h"
 
 using namespace scaena;
 
 
-RaytracerGui::RaytracerGui(const std::shared_ptr<Play>& play) :
-    _ui(new Ui::RaytracerGui),
+ExAnimatorGui::ExAnimatorGui(const std::shared_ptr<Play>& play) :
+    _ui(new Ui::ExAnimatorGui),
     _play(play)
 {
     _ui->setupUi(this);
@@ -28,18 +28,18 @@ RaytracerGui::RaytracerGui(const std::shared_ptr<Play>& play) :
     _animationManager.reset(new AnimationManager(_ui));
     _timelineManager.reset(new TimelineManager(_ui));
     _pathManager.reset(new PathManager(_ui));
-    _raytracedView.reset(new RaytracedView(
+    _view.reset(new ExAnimatorView(
          _cameraManager,
          _animationManager,
          _timelineManager,
          _postProdManager,
          _pathManager));
 
-    _cameraManager->setView(_raytracedView.get());
-    _play->addView(_raytracedView);
+    _cameraManager->setView(_view.get());
+    _play->addView(_view);
 }
 
-RaytracerGui::~RaytracerGui()
+ExAnimatorGui::~ExAnimatorGui()
 {
     delete _ui;
 }

@@ -1,5 +1,5 @@
-#ifndef RAYTRACEDVIEW_H
-#define RAYTRACEDVIEW_H
+#ifndef EXANIMATORVIEW_H
+#define EXANIMATORVIEW_H
 
 #include <Scaena/ScaenaApplication/QGlWidgetView.h>
 
@@ -20,16 +20,16 @@ class TheFruitChoreographer;
 
 
 
-class RaytracedView : public scaena::QGlWidgetView
+class ExAnimatorView : public scaena::QGlWidgetView
 {
 public:
-    RaytracedView(
+    ExAnimatorView(
         const std::shared_ptr<CameraManager>& cameraManager,
         const std::shared_ptr<AnimationManager>& animationManager,
         const std::shared_ptr<TimelineManager>& timelineManager,
         const std::shared_ptr<PostProdManager>& postProdManager,
         const std::shared_ptr<PathManager>& pathManager);
-    virtual ~RaytracedView();
+    virtual ~ExAnimatorView();
 
 
 protected:
@@ -49,4 +49,4 @@ private:
     std::shared_ptr<prop3::ArtDirectorServer> _raytracerServer;
 };
 
-#endif // RAYTRACEDVIEW_H
+#endif // EXANIMATORVIEW_H

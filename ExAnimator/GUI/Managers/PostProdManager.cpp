@@ -13,13 +13,13 @@
 
 #include <PropRoom3D/Team/ArtDirector/GlPostProdUnit.h>
 
-#include "../RaytracerGui.h"
-#include "ui_RaytracerGui.h"
+#include "../ExAnimatorGui.h"
+#include "ui_ExAnimatorGui.h"
 
 using namespace prop3;
 
 
-PostProdManager::PostProdManager(Ui::RaytracerGui* ui) :
+PostProdManager::PostProdManager(Ui::ExAnimatorGui* ui) :
     _ui(ui)
 {
     connect(_ui->activateLowpassCheck, &QCheckBox::stateChanged,

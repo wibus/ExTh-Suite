@@ -10,7 +10,7 @@
 
 namespace Ui
 {
-    class RaytracerGui;
+    class ExAnimatorGui;
 }
 
 class TheFruitChoreographer;
@@ -21,7 +21,7 @@ class TimelineManager : public QObject
     Q_OBJECT
 
 public:
-    TimelineManager(Ui::RaytracerGui* ui);
+    TimelineManager(Ui::ExAnimatorGui* ui);
     virtual ~TimelineManager();
 
     virtual void setChoreographer(
@@ -58,7 +58,7 @@ protected:
     virtual double computeCurrentTime();
 
 private:
-    Ui::RaytracerGui* _ui;
+    Ui::ExAnimatorGui* _ui;
     std::shared_ptr<TheFruitChoreographer> _choreographer;
 };
 

@@ -1,4 +1,4 @@
-#include "RaytracedView.h"
+#include "ExAnimatorView.h"
 
 #include <PropRoom2D/Team/AbstractTeam.h>
 #include <PropRoom2D/Team/ArtDirector/GlArtDirector.h>
@@ -16,7 +16,7 @@
 #include "Managers/PathManager.h"
 
 
-RaytracedView::RaytracedView(
+ExAnimatorView::ExAnimatorView(
         const std::shared_ptr<CameraManager>& cameraManager,
         const std::shared_ptr<AnimationManager>& animationManager,
         const std::shared_ptr<TimelineManager>& timelineManager,
@@ -31,12 +31,12 @@ RaytracedView::RaytracedView(
 {
 }
 
-RaytracedView::~RaytracedView()
+ExAnimatorView::~ExAnimatorView()
 {
 
 }
 
-void RaytracedView::installArtDirectors(scaena::Play& play)
+void ExAnimatorView::installArtDirectors(scaena::Play& play)
 {
     _artDirector2D.reset(new prop2::GlArtDirector());
     play.propTeam2D()->addArtDirector(_artDirector2D);
@@ -53,7 +53,7 @@ void RaytracedView::installArtDirectors(scaena::Play& play)
     _stageSet = play.propTeam3D()->stageSet();
 }
 
-void RaytracedView::setup()
+void ExAnimatorView::setup()
 {
     _artDirector2D->resize(width(), height());
     _cameraManager->setRaytracer(_raytracerServer);

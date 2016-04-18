@@ -13,7 +13,7 @@
 
 namespace Ui
 {
-    class RaytracerGui;
+    class ExAnimatorGui;
 }
 
 class TheFruitChoreographer;
@@ -24,7 +24,7 @@ class AnimationManager : public QObject
     Q_OBJECT
 
 public:
-    AnimationManager(Ui::RaytracerGui* ui);
+    AnimationManager(Ui::ExAnimatorGui* ui);
     virtual ~AnimationManager();
 
     virtual void setChoreographer(
@@ -58,7 +58,7 @@ private slots:
     virtual void clearReferenceShot();
 
 private:
-    Ui::RaytracerGui* _ui;
+    Ui::ExAnimatorGui* _ui;
     QMediaPlayer _mediaPlayer;
     std::shared_ptr<prop3::ArtDirectorServer> _raytracer;
     std::shared_ptr<TheFruitChoreographer> _choreographer;

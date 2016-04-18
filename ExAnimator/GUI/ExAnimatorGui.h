@@ -1,5 +1,5 @@
-#ifndef RAYTRACERGUI_H
-#define RAYTRACERGUI_H
+#ifndef EXANIMATORGUI_H
+#define EXANIMATORGUI_H
 
 #include <QMainWindow>
 
@@ -7,10 +7,10 @@
 
 namespace Ui
 {
-    class RaytracerGui;
+    class ExAnimatorGui;
 }
 
-class RaytracedView;
+class ExAnimatorView;
 class CameraManager;
 class AnimationManager;
 class TimelineManager;
@@ -18,19 +18,19 @@ class PostProdManager;
 class PathManager;
 
 
-class RaytracerGui : public QMainWindow
+class ExAnimatorGui : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit RaytracerGui(const std::shared_ptr<scaena::Play>& play);
+    explicit ExAnimatorGui(const std::shared_ptr<scaena::Play>& play);
 
-    ~RaytracerGui();
+    ~ExAnimatorGui();
 
 private:
-    Ui::RaytracerGui* _ui;
+    Ui::ExAnimatorGui* _ui;
     std::shared_ptr<scaena::Play> _play;
-    std::shared_ptr<RaytracedView> _raytracedView;
+    std::shared_ptr<ExAnimatorView> _view;
     std::shared_ptr<CameraManager> _cameraManager;
     std::shared_ptr<AnimationManager> _animationManager;
     std::shared_ptr<TimelineManager> _timelineManager;
@@ -38,4 +38,4 @@ private:
     std::shared_ptr<PathManager> _pathManager;
 };
 
-#endif // RAYTRACERGUI_H
+#endif // EXANIMATORGUI_H

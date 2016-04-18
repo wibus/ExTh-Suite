@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RaytracerGui</class>
- <widget class="QMainWindow" name="RaytracerGui">
+ <class>ExAnimatorGui</class>
+ <widget class="QMainWindow" name="ExAnimatorGui">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -1361,7 +1361,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resources/CpuRaytracing.qrc">
+              <iconset resource="../resources/ExAnimator.qrc">
                <normaloff>:/CpuRaytracing/1454898768_replay.png</normaloff>:/CpuRaytracing/1454898768_replay.png</iconset>
              </property>
             </widget>
@@ -1378,7 +1378,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resources/CpuRaytracing.qrc">
+              <iconset resource="../resources/ExAnimator.qrc">
                <normaloff>:/CpuRaytracing/1456006623_Gnome-Media-Record-64.png</normaloff>:/CpuRaytracing/1456006623_Gnome-Media-Record-64.png</iconset>
              </property>
              <property name="checkable">
@@ -1398,7 +1398,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resources/CpuRaytracing.qrc">
+              <iconset resource="../resources/ExAnimator.qrc">
                <normaloff>:/CpuRaytracing/1454898739_play-circle-outline.png</normaloff>
                <normalon>:/CpuRaytracing/1456006111_pause-circle-outline.png</normalon>:/CpuRaytracing/1454898739_play-circle-outline.png</iconset>
              </property>
@@ -1419,7 +1419,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resources/CpuRaytracing.qrc">
+              <iconset resource="../resources/ExAnimator.qrc">
                <normaloff>:/CpuRaytracing/1454898776_fast-forward.png</normaloff>:/CpuRaytracing/1454898776_fast-forward.png</iconset>
              </property>
              <property name="checkable">
@@ -1449,7 +1449,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="resources/CpuRaytracing.qrc"/>
+  <include location="../resources/ExAnimator.qrc"/>
  </resources>
  <connections/>
  <buttongroups>

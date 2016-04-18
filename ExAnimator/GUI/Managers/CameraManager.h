@@ -11,14 +11,14 @@
 
 namespace Ui
 {
-    class RaytracerGui;
+    class ExAnimatorGui;
 }
 
 
 class CameraManager : public QObject
 {
 public:
-    CameraManager(Ui::RaytracerGui* ui);
+    CameraManager(Ui::ExAnimatorGui* ui);
     virtual ~CameraManager();
 
     virtual void setView(QWidget* view);
@@ -44,7 +44,7 @@ protected:
     virtual bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
-    Ui::RaytracerGui* _ui;
+    Ui::ExAnimatorGui* _ui;
     QWidget* _view;
     QWidget* _fullscreenWindow;
     std::shared_ptr<cellar::Camera> _camera;
