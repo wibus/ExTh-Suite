@@ -4,3 +4,11 @@ CMakeScripts
 Makefile
 cmake_install.cmake
 install_manifest.txt
+*.user
+
+# Animations
+frames
+films
+titles
+composites
+*.mp4

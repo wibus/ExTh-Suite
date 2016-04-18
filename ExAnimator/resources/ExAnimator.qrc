@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/CpuRaytracing">
+        <file>1454898739_play-circle-outline.png</file>
+        <file>1454898768_replay.png</file>
+        <file>1454898776_fast-forward.png</file>
+        <file>1456006111_pause-circle-outline.png</file>
+        <file>1456006623_Gnome-Media-Record-64.png</file>
+    </qresource>
+</RCC>
