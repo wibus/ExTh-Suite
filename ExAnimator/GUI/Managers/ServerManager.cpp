@@ -62,6 +62,9 @@ void ServerManager::runServer(bool run)
     }
     else
     {
+        if(_server->isRunning())
+            _server->turnOff();
+
         _ui->tcpPortEdit->setEnabled(true);
     }
 }

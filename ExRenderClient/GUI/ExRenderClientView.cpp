@@ -66,6 +66,9 @@ void ExRenderClientView::setup()
 
     connect(_ui->updateEachTileCheck, &QCheckBox::toggled,
             this, &ExRenderClientView::updateEachTile);
+
+    connect(_ui->connectButton, &QCheckBox::toggled,
+            this, &ExRenderClientView::connectToServer);
 }
 
 void ExRenderClientView::ipAddress(const QString& ip)
@@ -75,7 +78,7 @@ void ExRenderClientView::ipAddress(const QString& ip)
 
 void ExRenderClientView::tcpPort(const QString& port)
 {
-    _artDirectorClient->setServerTcpPort(port.toStdString());
+    _artDirectorClient->setServerTcpPort(port.toInt());
 }
 
 void ExRenderClientView::updateEachTile(bool update)
@@ -86,8 +89,26 @@ void ExRenderClientView::updateEachTile(bool update)
 void ExRenderClientView::connectToServer(bool connect)
 {
     if(connect)
+    {
         _artDirectorClient->connectToServer();
+
+        if(_artDirectorClient->isConnected())
+        {
+            _ui->ipAddressEdit->setEnabled(false);
+            _ui->tcpPortEdit->setEnabled(false);
+        }
+        else
+        {
+            _ui->connectButton->setChecked(false);
+        }
+    }
     else
-        _artDirectorClient->deconnectFromServer();
+    {
+        if(_artDirectorClient->isConnected())
+            _artDirectorClient->disconnectFromServer();
+
+        _ui->ipAddressEdit->setEnabled(true);
+        _ui->tcpPortEdit->setEnabled(true);
+    }
 }
 
