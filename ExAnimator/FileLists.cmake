@@ -3,6 +3,7 @@ SET(ExAnimator_MANAGERS_HEADERS
     ${ExAnimator_SRC_DIR}/GUI/Managers/AnimationManager.h
     ${ExAnimator_SRC_DIR}/GUI/Managers/TimelineManager.h
     ${ExAnimator_SRC_DIR}/GUI/Managers/PostProdManager.h
+    ${ExAnimator_SRC_DIR}/GUI/Managers/ServerManager.h
     ${ExAnimator_SRC_DIR}/GUI/Managers/CameraManager.h
     ${ExAnimator_SRC_DIR}/GUI/Managers/PathManager.h)
 
@@ -32,6 +33,7 @@ SET(ExAnimator_MANAGERS_SOURCES
     ${ExAnimator_SRC_DIR}/GUI/Managers/AnimationManager.cpp
     ${ExAnimator_SRC_DIR}/GUI/Managers/TimelineManager.cpp
     ${ExAnimator_SRC_DIR}/GUI/Managers/PostProdManager.cpp
+    ${ExAnimator_SRC_DIR}/GUI/Managers/ServerManager.cpp
     ${ExAnimator_SRC_DIR}/GUI/Managers/CameraManager.cpp
     ${ExAnimator_SRC_DIR}/GUI/Managers/PathManager.cpp)
 

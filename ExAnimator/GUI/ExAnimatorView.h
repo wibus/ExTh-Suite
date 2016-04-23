@@ -14,6 +14,7 @@ class CameraManager;
 class AnimationManager;
 class TimelineManager;
 class PostProdManager;
+class ServerManager;
 class PathManager;
 
 class TheFruitChoreographer;
@@ -28,6 +29,7 @@ public:
         const std::shared_ptr<AnimationManager>& animationManager,
         const std::shared_ptr<TimelineManager>& timelineManager,
         const std::shared_ptr<PostProdManager>& postProdManager,
+        const std::shared_ptr<ServerManager>& serverManager,
         const std::shared_ptr<PathManager>& pathManager);
     virtual ~ExAnimatorView();
 
@@ -42,6 +44,7 @@ private:
     std::shared_ptr<AnimationManager> _animationManager;
     std::shared_ptr<TimelineManager> _timelineManager;
     std::shared_ptr<PostProdManager> _postProdManager;
+    std::shared_ptr<ServerManager> _serverManager;
     std::shared_ptr<PathManager> _pathManager;
 
     std::shared_ptr<prop3::StageSet> _stageSet;

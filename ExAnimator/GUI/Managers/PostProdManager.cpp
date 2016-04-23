@@ -12,6 +12,7 @@
 #include <CellarWorkbench/GL/GlInputsOutputs.h>
 
 #include <PropRoom3D/Team/ArtDirector/GlPostProdUnit.h>
+#include <PropRoom3D/Team/ArtDirector/ArtDirectorServer.h>
 
 #include "../ExAnimatorGui.h"
 #include "ui_ExAnimatorGui.h"
@@ -64,9 +65,9 @@ PostProdManager::~PostProdManager()
 }
 
 void PostProdManager::setPostProdUnit(
-        const std::shared_ptr<prop3::GlPostProdUnit>& unitBackend)
+        const std::shared_ptr<ArtDirectorServer>& raytracer)
 {
-    _unitBackend = unitBackend;
+    _unitBackend = raytracer->postProdUnit();
 
     lowpassSizeChanged(_ui->lowpassSizeCombo->currentIndex());
     lowpassVarianceChanged(_ui->lowpassVarianceSpin->value());

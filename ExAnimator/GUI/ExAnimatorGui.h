@@ -15,6 +15,7 @@ class CameraManager;
 class AnimationManager;
 class TimelineManager;
 class PostProdManager;
+class ServerManager;
 class PathManager;
 
 
@@ -35,6 +36,7 @@ private:
     std::shared_ptr<AnimationManager> _animationManager;
     std::shared_ptr<TimelineManager> _timelineManager;
     std::shared_ptr<PostProdManager> _postProdManager;
+    std::shared_ptr<ServerManager> _serverManager;
     std::shared_ptr<PathManager> _pathManager;
 };
 

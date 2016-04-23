@@ -19,7 +19,7 @@ class ExRenderClientGui : public QMainWindow
 
 public:
     explicit ExRenderClientGui(const std::shared_ptr<scaena::Play>& play);
-    ~ExRenderClientGui();
+    virtual ~ExRenderClientGui();
 
 private:
     Ui::ExRenderClientGui *_ui;

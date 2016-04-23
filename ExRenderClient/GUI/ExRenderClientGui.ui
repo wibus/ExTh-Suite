@@ -18,30 +18,43 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLabel" name="serverAddressLabel">
+       <widget class="QLabel" name="ipAddressLabel">
         <property name="text">
          <string>ServerAddress</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="serverAddressEdit">
+       <widget class="QLineEdit" name="ipAddressEdit">
+        <property name="text">
+         <string>192.168.1.3</string>
+        </property>
         <property name="placeholderText">
          <string>255.255.255.255</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="portLabel">
+       <widget class="QLabel" name="tcpPortLabel">
         <property name="text">
          <string>Port:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="portEdit">
+       <widget class="QLineEdit" name="tcpPortEdit">
         <property name="text">
          <string>8004</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="updateEachTileCheck">
+        <property name="text">
+         <string>Update each tile</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -62,6 +75,9 @@
        <widget class="QPushButton" name="connectButton">
         <property name="text">
          <string>Connect</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

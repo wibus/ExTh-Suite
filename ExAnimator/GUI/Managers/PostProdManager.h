@@ -13,6 +13,7 @@ namespace Ui
 namespace prop3
 {
     class GlPostProdUnit;
+    class ArtDirectorServer;
 }
 
 
@@ -25,7 +26,7 @@ public:
     virtual ~PostProdManager();
 
     virtual void setPostProdUnit(
-        const std::shared_ptr<prop3::GlPostProdUnit>& unitBackend);
+        const std::shared_ptr<prop3::ArtDirectorServer>& raytracer);
 
 private slots:
     virtual void activateLowPassChecked(int state);

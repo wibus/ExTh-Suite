@@ -7,6 +7,8 @@
 
 #include "ExRenderClientView.h"
 
+using namespace prop3;
+
 
 ExRenderClientGui::ExRenderClientGui(const std::shared_ptr<scaena::Play>& play) :
     _ui(new Ui::ExRenderClientGui),
@@ -16,7 +18,7 @@ ExRenderClientGui::ExRenderClientGui(const std::shared_ptr<scaena::Play>& play) 
     QPoint center = QApplication::desktop()->availableGeometry(this).center();
     move(center.x()-width()*0.5, center.y()-height()*0.5);
 
-    _view.reset(new ExRenderClientView());
+    _view.reset(new ExRenderClientView(_ui));
     _ui->viewScrollArea->setWidget(_view.get());
     _play->addView(_view);
 }

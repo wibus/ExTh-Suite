@@ -13,6 +13,7 @@
 #include "Managers/AnimationManager.h"
 #include "Managers/TimelineManager.h"
 #include "Managers/PostProdManager.h"
+#include "Managers/ServerManager.h"
 #include "Managers/PathManager.h"
 
 
@@ -21,12 +22,14 @@ ExAnimatorView::ExAnimatorView(
         const std::shared_ptr<AnimationManager>& animationManager,
         const std::shared_ptr<TimelineManager>& timelineManager,
         const std::shared_ptr<PostProdManager>& postProdManager,
+        const std::shared_ptr<ServerManager>& serverManager,
         const std::shared_ptr<PathManager>& pathManager) :
     scaena::QGlWidgetView("Raytraced View"),
     _cameraManager(cameraManager),
     _animationManager(animationManager),
     _timelineManager(timelineManager),
     _postProdManager(postProdManager),
+    _serverManager(serverManager),
     _pathManager(pathManager)
 {
 }
@@ -57,8 +60,8 @@ void ExAnimatorView::setup()
 {
     _artDirector2D->resize(width(), height());
     _cameraManager->setRaytracer(_raytracerServer);
-    _postProdManager->setPostProdUnit(_raytracerServer->postProdUnit());
-
+    _serverManager->setRaytracer(_raytracerServer);
+    _postProdManager->setPostProdUnit(_raytracerServer);
     _animationManager->setChoreographer(_choreographer);
     _animationManager->setRaytracer(_raytracerServer);
 
