@@ -614,7 +614,12 @@
           <item row="2" column="0" colspan="2">
            <widget class="QPushButton" name="runServerButton">
             <property name="text">
-             <string>Run Server</string>
+             <string>  Server</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/ExAnimator.qrc">
+              <normaloff>:/CpuRaytracing/1454898739_play-circle-outline.png</normaloff>
+              <normalon>:/CpuRaytracing/1456006111_pause-circle-outline.png</normalon>:/CpuRaytracing/1454898739_play-circle-outline.png</iconset>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -669,7 +674,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="postProdTab">
          <attribute name="title">
