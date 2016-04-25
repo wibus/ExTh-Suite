@@ -15,8 +15,8 @@ ExRenderClientGui::ExRenderClientGui(const std::shared_ptr<scaena::Play>& play) 
     _play(play)
 {
     _ui->setupUi(this);
-    QPoint center = QApplication::desktop()->availableGeometry(this).center();
-    move(center.x()-width()*0.5, center.y()-height()*0.5);
+    QPoint topRight = QApplication::desktop()->availableGeometry(this).topRight();
+    move(topRight.x()-width(), topRight.y()-height());
 
     _view.reset(new ExRenderClientView(_ui));
     _ui->viewScrollArea->setWidget(_view.get());
