@@ -25,7 +25,7 @@ AnimationManager::AnimationManager(Ui::ExAnimatorGui* ui) :
     connect(_ui->divThresholdSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &AnimationManager::divThreshold);
 
-    connect(_ui->visibilityThresholdSpin, static_cast<void(QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(_ui->visibilityThresholdSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &AnimationManager::surfaceVisibilityThreshold);
 
 
@@ -105,7 +105,7 @@ void AnimationManager::maxRenderTimeThreshold(int maxSeconds)
     _raytracer->raytracerState()->setRenderTimeThreshold(maxSeconds);
 }
 
-void AnimationManager::surfaceVisibilityThreshold(int visibility)
+void AnimationManager::surfaceVisibilityThreshold(double visibility)
 {
     _raytracer->raytracerState()->setSurfaceVisibilityThreshold(visibility);
 }

@@ -42,7 +42,7 @@ private slots:
     virtual void divThreshold(double div);
     virtual void maxSampleThreshold(int sampleCount);
     virtual void maxRenderTimeThreshold(int maxSeconds);
-    virtual void surfaceVisibilityThreshold(int visibility);
+    virtual void surfaceVisibilityThreshold(double visibility);
 
     virtual void soundtrackName(QString name);
     virtual void soundtrackVolume(int volume);
