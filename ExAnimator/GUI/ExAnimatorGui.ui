@@ -41,7 +41,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="cameraTab">
          <attribute name="title">
@@ -656,8 +656,8 @@
         <widget class="QWidget" name="raytracedScollViewContents">
          <property name="geometry">
           <rect>
-           <x>211</x>
-           <y>69</y>
+           <x>214</x>
+           <y>71</y>
            <width>978</width>
            <height>660</height>
           </rect>
@@ -683,7 +683,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="postProdTab">
          <attribute name="title">
@@ -1498,7 +1498,7 @@
      <x>0</x>
      <y>0</y>
      <width>2100</width>
-     <height>27</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

@@ -31,8 +31,8 @@ Q_DECLARE_METATYPE(AbstractPath<glm::dvec3>*)
 Spin::Spin(double value)
 {
     setDecimals(2);
-    setMinimum(-400);
-    setMaximum( 400);
+    setMinimum(-999);
+    setMaximum( 999);
     setSingleStep(0.1);
     setValue(value);
 }
