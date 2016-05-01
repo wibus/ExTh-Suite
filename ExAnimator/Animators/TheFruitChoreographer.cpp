@@ -107,9 +107,6 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     // Stage //
     ///////////
 
-    double porticoTh = 0.18;
-    double porticoTop = 4.0;
-
     glm::dvec3 boxMin(-5, -5, 0.0);
     glm::dvec3 boxMax( 5,  5, 5.0);
     glm::dvec3 boxDia = boxMax - boxMin;
@@ -117,8 +114,13 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     glm::dvec3 wallThickness = glm::dvec3(0.1);
     glm::dvec3 doorDim(0.85, 0.85, 2.0 * 2);
 
+    double porticoTh = 0.18;
+    double porticoTop = 3.5;
+    double porticoLen = boxDia.x * 8.0 / 9.0;
+    double porticoDepth = boxDia.y * 1.3 / 5.0;
+
     glm::dvec3 hallMin(boxCenter.x + wallThickness.x, boxCenter.y + wallThickness.y, -1.0);
-    glm::dvec3 hallMax(boxMax.x - wallThickness.x, boxMax.y - wallThickness.y, boxCenter.z - wallThickness.z);
+    glm::dvec3 hallMax(boxMax.x - wallThickness.x, boxMax.y + wallThickness.y, boxCenter.z - wallThickness.z);
     glm::dvec3 boudMin(boxCenter.x + wallThickness.x, boxMin.y - wallThickness.y, -1.0);
     glm::dvec3 boudMax(boxMax.x + wallThickness.x, boxCenter.y - wallThickness.y, porticoTop);
     glm::dvec3 roomMin(boxMin.x + wallThickness.x, boxMin.y + wallThickness.y, -1.0);
@@ -154,7 +156,6 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     pSurf smallWindowHole2 = !Box::boxPosDims(
             glm::dvec3(boxMax.x - boxDia.x*3.0/8.0, boxMax.y, boxDia.z*0.3),
             glm::dvec3(boxDia.z/6.0, 1, boxDia.z/5.0));
-    */
     // Show room windows
     pSurf smallWindowHole3 = !Box::boxPosDims(
             glm::dvec3(boxMax.x - boxDia.x*15.5/24.0, boxMax.y, boxDia.z*0.3),
@@ -162,6 +163,10 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     pSurf smallWindowHole4 = !Box::boxPosDims(
             glm::dvec3(boxMax.x - boxDia.x*20.5/24.0, boxMax.y, boxDia.z*0.3),
             glm::dvec3(boxDia.x*2.5/24, 1, boxDia.z/6.0));
+    */
+    pSurf roomWallHole = !Box::boxPosDims(
+            glm::dvec3(boxMin.x / 2.0, boxMax.y, boxDia.z / 5.0 - wallThickness.z),
+            glm::dvec3(boxDia.x/2.0 - wallThickness.x*3.0, 1, boxDia.z / 5 * 3.0));
     pSurf smallWindowHole5 = !Box::boxPosDims(
             glm::dvec3(boxMax.x - boxDia.x*15.5/24.0, boxMin.y, boxDia.z*0.3),
             glm::dvec3(boxDia.x*2.5/24, 1, boxDia.z/6.0));
@@ -171,28 +176,41 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
 
     pSurf stageSurf = box & hall & room & boud &
         hallEntrance & roomEntrance & glassPassage & roomPassage &
-        smallWindowHole3 &
-        smallWindowHole4 & smallWindowHole5 & smallWindowHole6 &
+        roomWallHole & smallWindowHole5 & smallWindowHole6 &
         crossWindowHole & longWindowHole;
 
-    pSurf stripWallSurf = createHoleStrippedWall(
+    pSurf boundStripWallSurf = createHoleStrippedWall(
         glm::dvec3(boxDia.x / 2.0, wallThickness.y, porticoTop - porticoTh),
-        0.35, 0.35, 0.35);
+        0.35, 0.35, 0.35, 0.75);
 
-    pSurf ynegStripWall = Surface::shell(stripWallSurf);
+    pSurf ynegStripWall = Surface::shell(boundStripWallSurf);
     Surface::translate(ynegStripWall, glm::dvec3(boxMax.x/2.0, boxMin.y+wallThickness.y/2.0, 0));
-    pSurf xposStripWall = Surface::shell(stripWallSurf);
+    pSurf xposStripWall = Surface::shell(boundStripWallSurf);
     Surface::rotate(xposStripWall, -glm::pi<double>()/2.0, glm::dvec3(0, 0, 1));
     Surface::translate(xposStripWall, glm::dvec3(boxMax.x-wallThickness.x/2.0, boxMin.y/2.0, 0));
+
+
+    pSurf floorStripWallSurf = createHoleStrippedWall(
+        glm::dvec3(boxDia.x / 2.0, wallThickness.y, boxMax.z/2.0),
+        0.35, 0.35, 0.35, 0.0);
+    pSurf hallStripWall = SurfaceShell::shell(floorStripWallSurf);
+    Surface::translate(hallStripWall, glm::dvec3(boxMax.x/2.0, boxMax.y-wallThickness.x/2.0, 0));
+    pSurf roomStripWall = SurfaceShell::shell(floorStripWallSurf);
+    Surface::translate(roomStripWall, glm::dvec3(boxMin.x/2.0, boxMax.y-wallThickness.x/2.0, 0));
 
     pCoat stageCoat = coating::createClearCoat(1.0);
     stageSurf->setCoating(stageCoat);
     xposStripWall->setCoating(stageCoat);
     ynegStripWall->setCoating(stageCoat);
+    hallStripWall->setCoating(stageCoat);
+    roomStripWall->setCoating(stageCoat);
+
     pMat stageMat = material::createInsulator(glm::dvec3(0.7), 1.45, 1.0, 1.0);
     stageSurf->setInnerMaterial(stageMat);
     xposStripWall->setInnerMaterial(stageMat);
     ynegStripWall->setInnerMaterial(stageMat);
+    hallStripWall->setInnerMaterial(stageMat);
+    roomStripWall->setInnerMaterial(stageMat);
 
 
     pZone stageZone(new StageZone("Stage Zone"));
@@ -208,7 +226,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     stageZone->addSubzone(xStrippedZone);
     xStrippedZone->setBounds( Box::boxCorners(
         glm::dvec3(boxMax.x - wallThickness.x, boxMin.y, boxMin.z),
-        glm::dvec3(boxMax.x, 0.0, boxMax.z)));
+        glm::dvec3(boxMax.x, 0.0, porticoTop)));
     xStrippedZone->addProp(xStrippedProp);
 
     pProp yStrippedProp(new Prop("Y Stripped Wall"));
@@ -217,8 +235,26 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     stageZone->addSubzone(yStrippedZone);
     yStrippedZone->setBounds( Box::boxCorners(
         glm::dvec3(0.0, boxMin.y, boxMin.z),
-        glm::dvec3(boxMax.x, boxMin.y + wallThickness.y, boxMax.z)));
+        glm::dvec3(boxMax.x, boxMin.y + wallThickness.y, porticoTop)));
     yStrippedZone->addProp(yStrippedProp);
+
+    pProp hallStrippedProp(new Prop("Hall Stripped Wall"));
+    hallStrippedProp->addSurface(hallStripWall);
+    pZone hallStrippedZone(new StageZone("Hall Stripped Zone"));
+    stageZone->addSubzone(hallStrippedZone);
+    hallStrippedZone->setBounds( Box::boxCorners(
+        glm::dvec3(0.0, boxMax.y-wallThickness.y, boxMin.z),
+        glm::dvec3(boxMax.x, boxMax.y, boxMax.z/2.0)));
+    hallStrippedZone->addProp(hallStrippedProp);
+
+    pProp roomStrippedProp(new Prop("Room Stripped Wall"));
+    roomStrippedProp->addSurface(roomStripWall);
+    pZone roomStrippedZone(new StageZone("Room Stripped Zone"));
+    stageZone->addSubzone(roomStrippedZone);
+    roomStrippedZone->setBounds( Box::boxCorners(
+        glm::dvec3(boxMin.x, boxMax.y-wallThickness.y, boxMin.z),
+        glm::dvec3(0.0, boxMax.y, boxMax.z/2.0)));
+    roomStrippedZone->addProp(roomStrippedProp);
 
 
     //////////
@@ -273,8 +309,6 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     ///////////////
     // Portico   //
     ///////////////
-    double porticoLen = boxDia.x * 8.0 / 9.0;
-    double porticoDepth = boxDia.y * 1.8 / 5.0;
     glm::dvec3 portOrig = glm::dvec3(boxMax.x, boxMin.y, 0);
     glm::dvec3 portU = glm::normalize(glm::dvec3(1, 0 , 0));
     glm::dvec3 portUR = glm::normalize(glm::dvec3(1, 0 ,-0.3));
@@ -1135,7 +1169,8 @@ std::shared_ptr<Surface> TheFruitChoreographer::createHoleStrippedWall(
         const glm::dvec3& size,
         double stripeWidth,
         double holeWidth,
-        double border)
+        double border,
+        double patternOffset)
 {
 
     double zmin = -size.x/2.0 + border;
@@ -1148,7 +1183,7 @@ std::shared_ptr<Surface> TheFruitChoreographer::createHoleStrippedWall(
     int patternCount = glm::round((zmax - zmin) / patternWidth);
 
     pSurf holes;
-    double stripZ = size.z / 2.0 - ((patternCount-1)/2.0) * patternWidth;
+    double stripZ = size.z / 2.0 - ((patternCount-1)/2.0) * (patternWidth) + patternOffset;
     for(int i=0; i < patternCount; ++i)
     {
         pSurf holeUp = Plane::plane(normalUp, glm::dvec3(0, 0, stripZ + holeOff/2.0));

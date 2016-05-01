@@ -69,7 +69,8 @@ protected:
             const glm::dvec3& size,
             double stripeWidth,
             double holeWidth,
-            double border);
+            double border,
+            double patternOffset);
 
 private:
     glm::dvec3 _cloudsPosition;
