@@ -933,28 +933,28 @@
                 "CtrlPts": [
                     60
                 ],
-                "Duration": 19.77,
+                "Duration": 21.77,
                 "Type": "PointPath"
             },
             {
                 "CtrlPts": [
                     60,
-                    80
+                    85
                 ],
-                "Duration": 6,
+                "Duration": 3,
                 "Type": "LinearPath"
             },
             {
                 "CtrlPts": [
-                    80
+                    85
                 ],
-                "Duration": 14.5,
+                "Duration": 15.5,
                 "Type": "PointPath"
             },
             {
                 "CtrlPts": [
-                    80,
-                    80,
+                    85,
+                    85,
                     60,
                     43,
                     30
@@ -1305,7 +1305,7 @@
                     8.5,
                     20
                 ],
-                "Duration": 19.23,
+                "Duration": 18.23,
                 "Type": "LinearPath"
             },
             {

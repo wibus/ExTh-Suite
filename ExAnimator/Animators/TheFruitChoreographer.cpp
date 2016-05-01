@@ -106,6 +106,10 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     ///////////
     // Stage //
     ///////////
+
+    double porticoTh = 0.18;
+    double porticoTop = 4.0;
+
     glm::dvec3 boxMin(-5, -5, 0.0);
     glm::dvec3 boxMax( 5,  5, 5.0);
     glm::dvec3 boxDia = boxMax - boxMin;
@@ -116,7 +120,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     glm::dvec3 hallMin(boxCenter.x + wallThickness.x, boxCenter.y + wallThickness.y, -1.0);
     glm::dvec3 hallMax(boxMax.x - wallThickness.x, boxMax.y - wallThickness.y, boxCenter.z - wallThickness.z);
     glm::dvec3 boudMin(boxCenter.x + wallThickness.x, boxMin.y - wallThickness.y, -1.0);
-    glm::dvec3 boudMax(boxMax.x + wallThickness.x, boxCenter.y - wallThickness.y, boxMax.z - wallThickness.z);
+    glm::dvec3 boudMax(boxMax.x + wallThickness.x, boxCenter.y - wallThickness.y, porticoTop);
     glm::dvec3 roomMin(boxMin.x + wallThickness.x, boxMin.y + wallThickness.y, -1.0);
     glm::dvec3 roomMax(boxCenter.x - wallThickness.x, boxMax.y - wallThickness.y, boxMax.z - wallThickness.z);
 
@@ -143,33 +147,36 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
             glm::dvec3(boxMin.y, 0, boxDia.z * 0.75),
             glm::dvec3(1, boxDia.y * 0.9, boxDia.z * 0.40));
 
+    /* //Hall windows
     pSurf smallWindowHole1 = !Box::boxPosDims(
             glm::dvec3(boxMax.x - boxDia.x/8.0, boxMax.y, boxDia.z*0.3),
             glm::dvec3(boxDia.z/6.0, 1, boxDia.z/5.0));
     pSurf smallWindowHole2 = !Box::boxPosDims(
             glm::dvec3(boxMax.x - boxDia.x*3.0/8.0, boxMax.y, boxDia.z*0.3),
             glm::dvec3(boxDia.z/6.0, 1, boxDia.z/5.0));
+    */
+    // Show room windows
     pSurf smallWindowHole3 = !Box::boxPosDims(
-            glm::dvec3(boxMax.x - boxDia.x*5.0/8.0, boxMax.y, boxDia.z*0.3),
-            glm::dvec3(boxDia.z/6.0, 1, boxDia.z/5.0));
+            glm::dvec3(boxMax.x - boxDia.x*15.5/24.0, boxMax.y, boxDia.z*0.3),
+            glm::dvec3(boxDia.x*2.5/24, 1, boxDia.z/6.0));
     pSurf smallWindowHole4 = !Box::boxPosDims(
-            glm::dvec3(boxMax.x - boxDia.x*7.0/8.0, boxMax.y, boxDia.z*0.3),
-            glm::dvec3(boxDia.z/6.0, 1, boxDia.z/5.0));
+            glm::dvec3(boxMax.x - boxDia.x*20.5/24.0, boxMax.y, boxDia.z*0.3),
+            glm::dvec3(boxDia.x*2.5/24, 1, boxDia.z/6.0));
     pSurf smallWindowHole5 = !Box::boxPosDims(
-            glm::dvec3(boxMax.x - boxDia.x*5.0/8.0, boxMin.y, boxDia.z*0.3),
-            glm::dvec3(boxDia.z/6.0, 1, boxDia.z/5.0));
+            glm::dvec3(boxMax.x - boxDia.x*15.5/24.0, boxMin.y, boxDia.z*0.3),
+            glm::dvec3(boxDia.x*2.5/24, 1, boxDia.z/6.0));
     pSurf smallWindowHole6 = !Box::boxPosDims(
-            glm::dvec3(boxMax.x - boxDia.x*7.0/8.0, boxMin.y, boxDia.z*0.3),
-            glm::dvec3(boxDia.z/6.0, 1, boxDia.z/5.0));
+            glm::dvec3(boxMax.x - boxDia.x*20.5/24.0, boxMin.y, boxDia.z*0.3),
+            glm::dvec3(boxDia.x*2.5/24, 1, boxDia.z/6.0));
 
     pSurf stageSurf = box & hall & room & boud &
         hallEntrance & roomEntrance & glassPassage & roomPassage &
-        smallWindowHole1 & smallWindowHole2 & smallWindowHole3 &
+        smallWindowHole3 &
         smallWindowHole4 & smallWindowHole5 & smallWindowHole6 &
         crossWindowHole & longWindowHole;
 
     pSurf stripWallSurf = createHoleStrippedWall(
-        glm::dvec3(boxDia.x / 2.0, wallThickness.y, boxDia.z),
+        glm::dvec3(boxDia.x / 2.0, wallThickness.y, porticoTop - porticoTh),
         0.35, 0.35, 0.35);
 
     pSurf ynegStripWall = Surface::shell(stripWallSurf);
@@ -262,6 +269,135 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     roofProp->setInnerMaterial(material::TITANIUM);
     roofProp->setCoating(roofCoat);
 
+
+    ///////////////
+    // Portico   //
+    ///////////////
+    double porticoLen = boxDia.x * 8.0 / 9.0;
+    double porticoDepth = boxDia.y * 1.8 / 5.0;
+    glm::dvec3 portOrig = glm::dvec3(boxMax.x, boxMin.y, 0);
+    glm::dvec3 portU = glm::normalize(glm::dvec3(1, 0 , 0));
+    glm::dvec3 portUR = glm::normalize(glm::dvec3(1, 0 ,-0.3));
+    glm::dvec3 portV = glm::normalize(glm::dvec3(0, 1 ,0));
+    glm::dvec3 portW = glm::normalize(glm::dvec3(0, 0 ,1));
+    glm::dvec3 portWR = glm::normalize(cross(portUR, portV));
+    double porticoDrop = porticoDepth  / glm::dot(portWR, portW)
+             * glm::length(glm::cross(portWR, portW));
+
+    pSurf porticoTopSurf = Plane::plane(portWR, portW * porticoTop);
+    pSurf porticoBotSurf = Plane::plane(-portWR, portW * (porticoTop-porticoTh));
+    pSurf porticoBegSurf = Plane::plane(-portV, portV * 0.0);
+    pSurf porticoEndSurf = Plane::plane(portV, portV * 1.0);
+    pSurf porticoRearSurf = Plane::plane(-portU, portU * 0.0);
+    pSurf porticoFrontSurf = Plane::plane(portU, portU * porticoDepth);
+    pSurf porticoSurf = (porticoTopSurf & porticoBotSurf &
+                         porticoBegSurf & porticoEndSurf &
+                         porticoRearSurf & porticoFrontSurf);
+
+    pSurf porticoSouthSurf = SurfaceShell::shell(porticoSurf);
+    Surface::transform(porticoSouthSurf, glm::scale(glm::dmat4(), glm::dvec3(1, porticoLen, 1)));
+
+    pSurf porticoWestSurf = SurfaceShell::shell(porticoSurf);
+    Surface::rotate(porticoWestSurf, -glm::pi<double>()/2, glm::dvec3(0, 0, 1));
+    Surface::transform(porticoWestSurf, glm::scale(glm::dmat4(), glm::dvec3(boxDia.x/2.0, 1.0, 1)));
+    Surface::translate(porticoWestSurf, glm::dvec3(-boxDia.x/2.0, 0, 0));
+
+    pSurf porticoPillarSouth1 = Box::boxCorners(
+        glm::dvec3(porticoDepth - porticoTh * 2.0,  0.0, 0.0),
+        glm::dvec3(porticoDepth - porticoTh, porticoTh, porticoTop - porticoDrop));
+    pSurf porticoPillarSouth2 = Box::boxCorners(
+        glm::dvec3(porticoDepth - porticoTh * 2.0,  porticoLen / 2.0 - porticoTh / 2.0, 0.0),
+        glm::dvec3(porticoDepth - porticoTh, porticoLen / 2.0 + porticoTh / 2.0, porticoTop - porticoDrop));
+    pSurf porticoPillarSouth3 = Box::boxCorners(
+        glm::dvec3(porticoDepth - porticoTh * 2.0,  porticoLen - porticoTh * 2.0, 0.0),
+        glm::dvec3(porticoDepth - porticoTh, porticoLen - porticoTh, porticoTop - porticoDrop));
+
+    pSurf porticoPillarWest1 = Box::boxCorners(
+        glm::dvec3(-boxDia.x/2.0 + porticoTh,      -porticoDepth + porticoTh, 0.0),
+        glm::dvec3(-boxDia.x/2.0 + porticoTh*2.0,  -porticoDepth + porticoTh * 2.0, porticoTop - porticoDrop));
+    pSurf porticoPillarWest2 = Box::boxCorners(
+        glm::dvec3(-porticoTh,  -porticoDepth + porticoTh, 0.0),
+        glm::dvec3(0.0,         -porticoDepth + porticoTh * 2.0, porticoTop - porticoDrop));
+
+
+    pSurf porticoTriNorthSurf =
+        Box::boxCorners(
+            glm::dvec3(0.0, porticoLen - porticoTh*2.0, porticoTop - porticoDrop - porticoTh),
+            glm::dvec3(porticoDepth - porticoTh*2.0, porticoLen - porticoTh, porticoTop))
+        &Plane::plane(portWR, glm::dvec3(0, 0, porticoTop - porticoTh));
+
+    pSurf porticoTriWestSurf =
+        Box::boxCorners(
+            glm::dvec3(-boxDia.x / 2.0 + porticoTh, -porticoDepth + porticoTh*2.0, porticoTop - porticoDrop - porticoTh),
+            glm::dvec3(-boxDia.x / 2.0 + porticoTh*2.0, 0.0, porticoTop))
+        &Plane::plane(glm::dvec3(portWR.y, -portWR.x, portWR.z),
+                      glm::dvec3(0, 0, porticoTop - porticoTh));
+
+    pSurf porticoRoundTop = Quadric::cone(1.0, 1.0);
+    pSurf porticoRoundBot = Quadric::cone(1.0, 1.0);
+    pSurf porticoRoundPeri = Quadric::cylinder(1.0, 1.0);
+    pSurf porticoRoundClipTop = Plane::plane(glm::dvec3(0, 0, 1), glm::dvec3(0));
+    porticoRoundTop = porticoRoundTop & porticoRoundClipTop;
+    pSurf porticoRoundClipBot = Plane::plane(glm::dvec3(0, 0, 1), glm::dvec3(0));
+    porticoRoundBot = porticoRoundBot & porticoRoundClipBot;
+    pSurf porticoRoundWest = Plane::plane(glm::dvec3(-1, 0, 0), glm::dvec3(0));
+    pSurf porticoRoundNorth = Plane::plane(glm::dvec3(0, 1, 0), glm::dvec3(0));
+    pSurf porticoRoundSurf = porticoRoundTop & !porticoRoundBot &
+            porticoRoundPeri & porticoRoundWest & porticoRoundNorth;
+
+    Surface::transform(porticoRoundSurf, glm::scale(glm::dmat4(), glm::dvec3(porticoDepth, porticoDepth, porticoDrop)));
+    Surface::translate(porticoRoundSurf, glm::dvec3(0, 0, porticoTop));
+    Surface::translate(porticoRoundBot, glm::dvec3(0, 0, -porticoTh));
+
+
+    pProp porticoPropSouth(new Prop("Portico South"));
+    porticoPropSouth->addSurface(porticoSouthSurf);
+    porticoPropSouth->addSurface(porticoPillarSouth1);
+    porticoPropSouth->addSurface(porticoPillarSouth2);
+    porticoPropSouth->addSurface(porticoPillarSouth3);
+    porticoPropSouth->addSurface(porticoTriNorthSurf);
+    porticoPropSouth->translate(portOrig);
+    porticoPropSouth->setCoating(roofCoat);
+    porticoPropSouth->setInnerMaterial(material::SILVER);
+
+    pProp porticoPropWest(new Prop("Portico West"));
+    porticoPropWest->addSurface(porticoWestSurf);
+    porticoPropWest->addSurface(porticoPillarWest1);
+    porticoPropWest->addSurface(porticoPillarWest2);
+    porticoPropWest->addSurface(porticoTriWestSurf);
+    porticoPropWest->translate(portOrig);
+    porticoPropWest->setCoating(roofCoat);
+    porticoPropWest->setInnerMaterial(material::SILVER);
+
+    pProp porticoPropRound(new Prop("Portico Round"));
+    porticoPropRound->addSurface(porticoRoundSurf);
+    porticoPropRound->translate(portOrig);
+    porticoPropRound->setCoating(roofCoat);
+    porticoPropRound->setInnerMaterial(material::SILVER);
+
+    pZone porticoSouthZone(new StageZone("Portico South Zone"));
+    porticoSouthZone->addProp(porticoPropSouth);
+    porticoSouthZone->setBounds(Box::boxCorners(
+        glm::dvec3(boxMax.x, boxMin.y, 0.0),
+        glm::dvec3(boxMax.x + porticoDepth, boxMin.y + porticoLen, porticoTop)));
+
+    pZone porticoWestZone(new StageZone("Portico West Zone"));
+    porticoWestZone->addProp(porticoPropWest);
+    porticoWestZone->setBounds(Box::boxCorners(
+        glm::dvec3(0.0, boxMin.y - porticoDepth, 0.0),
+        glm::dvec3(boxMax.x, boxMin.y, porticoTop)));
+
+    pZone porticoRoundZone(new StageZone("Portico Round Zone"));
+    porticoRoundZone->addProp(porticoPropRound);
+    porticoRoundZone->setBounds(Box::boxCorners(
+        glm::dvec3(boxMax.x, boxMin.y - porticoDepth, porticoTop - porticoDrop - porticoTh),
+        glm::dvec3(boxMax.x + porticoDepth, boxMin.y, porticoTop)));
+
+    pZone porticoZone(new StageZone("Portico Zone"));
+    porticoZone->addSubzone(porticoSouthZone);
+    porticoZone->addSubzone(porticoWestZone);
+    porticoZone->addSubzone(porticoRoundZone);
+    stageZone->addSubzone(porticoZone);
 
 
     ////////////////////////
