@@ -181,7 +181,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
 
     pSurf boundStripWallSurf = createHoleStrippedWall(
         glm::dvec3(boxDia.x / 2.0, wallThickness.y, porticoTop - porticoTh),
-        0.35, 0.35, 0.35, 0.75);
+        0.35, 0.35, 0.35, 0.70);
 
     pSurf ynegStripWall = Surface::shell(boundStripWallSurf);
     Surface::translate(ynegStripWall, glm::dvec3(boxMax.x/2.0, boxMin.y+wallThickness.y/2.0, 0));
@@ -261,9 +261,31 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     // Roof //
     //////////
     double roofSide = 0.2;
+    double roofRaise = 1.0;
+    glm::dvec3 roofUp = glm::normalize(glm::dvec3(0, roofRaise, boxDia.y / 2.0));
     glm::dvec3 roofMin(boxMin.x * 1.80, boxMin.y * 1.80, boxMax.z);
     glm::dvec3 roofMax(boxMax.x * 1.30, boxMax.y * 1.30, boxMax.z + roofSide);
-    pSurf roofSurf = Box::boxCorners(roofMin, roofMax);
+    double roofIncl = glm::length(glm::cross(roofUp, glm::dvec3(0, 0, 1))) / glm::dot(roofUp, glm::dvec3(0, 0, 1));
+    double roofDrop = (boxMin.x-roofMin.x) * roofIncl;
+
+    pSurf roofBox = Box::boxCorners(roofMin - glm::dvec3(0, 0, 0),
+                                    roofMax + glm::dvec3(0, 0, roofRaise + roofDrop));
+    pSurf roofEstUpSurf = Plane::plane(glm::dvec3(roofUp.x, roofUp.y, roofUp.z),
+        glm::dvec3(0, 0, roofMax.z + roofRaise + roofDrop));
+    pSurf roofEstDownSurf = Plane::plane(glm::dvec3(-roofUp.x, -roofUp.y, -roofUp.z),
+        glm::dvec3(0, 0, roofMin.z + roofRaise + roofDrop));
+    pSurf roofWestUpSurf = Plane::plane(glm::dvec3(roofUp.x, -roofUp.y, roofUp.z),
+        glm::dvec3(0, 0, roofMax.z + roofRaise + roofDrop));
+    pSurf roofWestDownSurf = Plane::plane(glm::dvec3(-roofUp.x, roofUp.y, -roofUp.z),
+        glm::dvec3(0, 0, roofMin.z + roofRaise + roofDrop));
+
+    pSurf roofSurf = roofBox & (roofEstUpSurf & roofWestUpSurf) &
+                                (roofEstDownSurf |roofWestDownSurf);
+
+    pSurf roofStuffingSurf = Box::boxPosDims(glm::dvec3(0, 0, boxMax.z + (roofRaise+roofDrop) / 2.0),
+                                             glm::dvec3(boxDia.x, boxDia.y, (roofRaise+roofDrop)));
+    roofStuffingSurf = roofStuffingSurf & !SurfaceShell::shell(roofEstDownSurf | roofWestDownSurf);
+
 
     double roofPillarSide = wallThickness.x * 2.0;
     double pillarBootSide = roofPillarSide * 1.5;
@@ -272,13 +294,13 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     glm::dvec2 pillarXnYp(roofMin.x+pillarBootSide, roofMax.y-pillarBootSide);
     glm::dvec2 pillarXpYp(roofMax.x-pillarBootSide, roofMax.y-pillarBootSide);
     pSurf roofPillardXnYn = Box::boxPosDims(
-        glm::dvec3(pillarXnYn, boxMax.z/2.0), glm::dvec3(roofSide, roofSide, boxDia.z));
+        glm::dvec3(pillarXnYn, boxMax.z/2.0), glm::dvec3(roofSide, roofSide, boxDia.z + 2.0*(roofDrop - roofIncl*(boxMin.y-roofMin.y)) + roofSide));
     pSurf roofPillardXpYn = Box::boxPosDims(
-        glm::dvec3(pillarXpYn, boxMax.z/2.0), glm::dvec3(roofSide, roofSide, boxDia.z));
+        glm::dvec3(pillarXpYn, boxMax.z/2.0), glm::dvec3(roofSide, roofSide, boxDia.z + 2.0*(roofDrop - roofIncl*(boxMin.y-roofMin.y)) + roofSide));
     pSurf roofPillardXnYp = Box::boxPosDims(
-        glm::dvec3(pillarXnYp, boxMax.z/2.0), glm::dvec3(roofSide, roofSide, boxDia.z));
+        glm::dvec3(pillarXnYp, boxMax.z/2.0), glm::dvec3(roofSide, roofSide, boxDia.z + 2.0*(roofDrop - roofIncl*(roofMax.y-boxMax.y)) + roofSide));
     pSurf roofPillardXpYp = Box::boxPosDims(
-        glm::dvec3(pillarXpYp, boxMax.z/2.0), glm::dvec3(roofSide, roofSide, boxDia.z));
+        glm::dvec3(pillarXpYp, boxMax.z/2.0), glm::dvec3(roofSide, roofSide, boxDia.z + 2.0*(roofDrop - roofIncl*(roofMax.y-boxMax.y)) + roofSide));
 
     pSurf pillarBootXnYn = Box::boxPosDims(
         glm::dvec3(pillarXnYn, pillarBootSide/2.0), glm::dvec3(pillarBootSide));
@@ -289,21 +311,42 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     pSurf pillarBootXpYp = Box::boxPosDims(
         glm::dvec3(pillarXpYp, pillarBootSide/2.0), glm::dvec3(pillarBootSide));
 
-    pProp roofProp(new Prop("Roof"));
-    roofProp->addSurface(roofSurf);
-    roofProp->addSurface(roofPillardXnYn);
-    roofProp->addSurface(roofPillardXpYn);
-    roofProp->addSurface(roofPillardXnYp);
-    roofProp->addSurface(roofPillardXpYp);
-    roofProp->addSurface(pillarBootXnYn);
-    roofProp->addSurface(pillarBootXpYn);
-    roofProp->addSurface(pillarBootXnYp);
-    roofProp->addSurface(pillarBootXpYp);
-    stageSet->addProp(roofProp);
 
+    pMat roofMat = material::TITANIUM;
     pCoat roofCoat = coating::createClearCoat(0.2);
-    roofProp->setInnerMaterial(material::TITANIUM);
-    roofProp->setCoating(roofCoat);
+
+    pProp roofPillarsProp(new Prop("Roof"));
+    roofPillarsProp->addSurface(roofPillardXnYn);
+    roofPillarsProp->addSurface(roofPillardXpYn);
+    roofPillarsProp->addSurface(roofPillardXnYp);
+    roofPillarsProp->addSurface(roofPillardXpYp);
+    roofPillarsProp->addSurface(pillarBootXnYn);
+    roofPillarsProp->addSurface(pillarBootXpYn);
+    roofPillarsProp->addSurface(pillarBootXnYp);
+    roofPillarsProp->addSurface(pillarBootXpYp);
+    roofPillarsProp->setInnerMaterial(roofMat);
+    roofPillarsProp->setCoating(roofCoat);
+
+    pProp roofTopProp(new Prop("Roof Top"));
+    roofTopProp->addSurface(roofSurf);
+    roofTopProp->setInnerMaterial(roofMat);
+    roofTopProp->setCoating(roofCoat);
+
+    pProp roofStuffProp(new Prop("Roof Stuff"));
+    roofStuffProp->addSurface(roofStuffingSurf);
+    roofStuffProp->setInnerMaterial(stageMat);
+    roofStuffProp->setCoating(stageCoat);
+
+    pZone roofTopZone(new StageZone("Roof Top Zone"));
+    roofTopZone->addProp(roofStuffProp);
+    roofTopZone->addProp(roofTopProp);
+    roofTopZone->setBounds(Box::boxCorners(
+        glm::dvec3(roofMin.x, roofMin.y, boxMax.z),
+        glm::dvec3(roofMax.x, roofMax.y,
+            boxMax.z + roofDrop + roofRaise + roofSide)));
+
+    stageSet->addProp(roofPillarsProp);
+    stageSet->addSubzone(roofTopZone);
 
 
     ///////////////
