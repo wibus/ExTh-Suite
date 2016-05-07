@@ -34,7 +34,7 @@ typedef std::shared_ptr<Prop> pProp;
 
 TheFruitChoreographer::TheFruitChoreographer(
         const std::shared_ptr<prop3::ArtDirectorServer>& raytracer) :
-    _camAperture(0.8),
+    _camAperture(0.65),
     _pathModel(new PathModel()),
     _raytracer(raytracer),
     _raytracerState(_raytracer->raytracerState()),
