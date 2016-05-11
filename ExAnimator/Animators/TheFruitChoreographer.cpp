@@ -58,11 +58,12 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
 {
     getSceneDocument().setSceneName("The Fruit");
     getSceneDocument().setStageSetName("StageSet");
-    std::string textureRoot = getSceneDocument().getTextureRootDirectory();
+    std::string textureRoot = getSceneDocument().getTexturesDirectory();
 
     // Environment
     _backdrop.reset( new ProceduralSun() );
     stageSet->setBackdrop(std::shared_ptr<Backdrop>(_backdrop));
+    //stageSet->setAmbientMaterial(material::createInsulator(glm::dvec3(0.98), material::AIR_REFRACTIVE_INDEX, 0.20, 1.0, 0.75));
 
     glm::dvec3 focusPos = glm::dvec3(0, 0, 1.0);
     glm::dvec3 camPos = focusPos + glm::dvec3(8, -15, 5) * 1.3;

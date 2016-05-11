@@ -28,7 +28,7 @@ SceneDocument::~SceneDocument()
 
 }
 
-void SceneDocument::setDocumentRootDirectory(const std::string& root)
+void SceneDocument::setRootDirectory(const std::string& root)
 {
     _rootDir = root;
 }
@@ -83,34 +83,39 @@ void SceneDocument::setAnimationTimeOffset(double offset)
     _animationTimeOffset = offset;
 }
 
+std::string SceneDocument::getSceneRootDirectory() const
+{
+    return _rootDir + _sceneName;
+}
+
 std::string SceneDocument::getStageSetFilePath() const
 {
-    return _rootDir + _sceneName + "/" + _stageSetName + ".prop3";
+    return getSceneRootDirectory() + "/" + _stageSetName + ".prop3";
 }
 
 std::string SceneDocument::getAnimationPathsFilePath() const
 {
-    return _rootDir + _sceneName + "/Paths.pth";
+    return getSceneRootDirectory() + "/Paths.pth";
 }
 
 std::string SceneDocument::getSoundtrackFilePath() const
 {
-    return _rootDir + _sceneName + "/audio/" + _soundtrackName;
-}
-
-std::string SceneDocument::getTextureRootDirectory() const
-{
-    return _rootDir + _sceneName + "/textures/";
+    return getSceneRootDirectory() + "/audio/" + _soundtrackName;
 }
 
 std::string SceneDocument::getAnimationFilmsDirectory() const
 {
-    return _rootDir + _sceneName + "/" + _outputFilmDirectory + "/";
+    return getSceneRootDirectory() + "/" + _outputFilmDirectory + "/";
 }
 
 std::string SceneDocument::getAnimationFramesDirectory() const
 {
-    return _rootDir + _sceneName + "/" + _outputFrameDirectory + "/";
+    return getSceneRootDirectory() + "/" + _outputFrameDirectory + "/";
+}
+
+std::string SceneDocument::getTexturesDirectory() const
+{
+    return getSceneRootDirectory() + "/textures/";
 }
 
 const double SEC_IN_MIN = 60.0;

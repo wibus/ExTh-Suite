@@ -61,8 +61,13 @@ void ExAnimatorCharacter::enterStage()
     //setupManufacturingStageSet();
     //setupCornBoardStageSet();
 
-//    play().propTeam3D()->saveScene(
-//        getSceneDocument().getStageSetFilePath());
+    play().propTeam3D()->saveScene(
+        getSceneDocument().getStageSetFilePath());/*
+    play().propTeam3D()->loadScene(
+        getSceneDocument().getStageSetFilePath());
+    play().propTeam3D()->saveScene(
+        getSceneDocument().getSceneRootDirectory() + "/StageCopy.prop3");
+        */
 }
 
 void ExAnimatorCharacter::beginStep(const StageTime &time)

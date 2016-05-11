@@ -14,8 +14,8 @@ class SceneDocument : public cellar::Singleton<SceneDocument>
     ~SceneDocument();
 
 public:
-    std::string documentRootDirectory() const;
-    void setDocumentRootDirectory(const std::string& root);
+    std::string rootDirectory() const;
+    void setRootDirectory(const std::string& root);
 
     std::string sceneName() const;
     void setSceneName(const std::string& name);
@@ -47,12 +47,13 @@ public:
     double animationTimeOffset() const;
     void setAnimationTimeOffset(double offset);
 
+    std::string getSceneRootDirectory() const;
     std::string getStageSetFilePath() const;
     std::string getAnimationPathsFilePath() const;
     std::string getSoundtrackFilePath() const;
-    std::string getTextureRootDirectory() const;
     std::string getAnimationFilmsDirectory() const;
     std::string getAnimationFramesDirectory() const;
+    std::string getTexturesDirectory() const;
 
     static std::string timeToString(double time);
 
@@ -74,7 +75,7 @@ SceneDocument& getSceneDocument();
 
 
 // IMPLEMENTATION //
-inline std::string SceneDocument::documentRootDirectory() const
+inline std::string SceneDocument::rootDirectory() const
 {
     return _rootDir;
 }
