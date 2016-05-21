@@ -156,6 +156,7 @@ void PostProdManager::luminosityChanged(int luminosity)
 
 void PostProdManager::equalizeHistogram()
 {
+    /*
     glm::dvec3 minComp;
     glm::dvec3 maxComp;
     _unitBackend->fetchImageMinAndMax(
@@ -167,6 +168,11 @@ void PostProdManager::equalizeHistogram()
 
     double lumi =  0.5 - (minVal + maxVal)*0.5;
     double cont = 1.0 / (maxVal - minVal);
+    */
+
+    double lumi, cont;
+    _unitBackend->getEqualizedImage(lumi, cont);
+
 
     _ui->luminositySlider->setValue(lumi * 50 + 50);
     _ui->contrastSlider->setValue(cont * 50);
