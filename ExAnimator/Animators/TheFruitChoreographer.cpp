@@ -82,12 +82,11 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     glm::dvec3 socelMax( 10.0,  10.0, 0.0);
     glm::dvec3 socleDia = socelMax - socelMin;
 
-    pSurf soceSurf = BoxTexture::boxCorners(
+    pSurf soceSurf = BoxSideTexture::boxCorners(
             socelMin, socelMax, // Corners
             socelMin,         // Tex Origin
             glm::dvec3(socleDia.x/7.0, 0.0, 0.0),
-            glm::dvec3(0.0, socleDia.y/7.0, 0.0),
-            true);
+            glm::dvec3(0.0, socleDia.y/7.0, 0.0));
 
     auto socleCoat = new TexturedStdCoating();
     socleCoat->setRoughnessTexName(textureRoot + "Bathroom_Tiles_gloss.png");
@@ -127,11 +126,20 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     glm::dvec3 roomMin(boxMin.x + wallThickness.x, boxMin.y + wallThickness.y, -1.0);
     glm::dvec3 roomMax(boxCenter.x - wallThickness.x, boxMax.y - wallThickness.y, boxMax.z - wallThickness.z);
 
-    pSurf box = Box::boxCorners( glm::dvec3(boxMin.x, boxMin.y, socelMin.z), boxMax);
+    pSurf box = BoxBandTexture::boxCorners(glm::dvec3(boxMin.x, boxMin.y, socelMin.z), boxMax,
+                    boxMin, glm::dvec3(10/6.0, 0, 0), glm::dvec3(0, 0, 40/6.0));
 
-    pSurf hall = !Box::boxCorners(hallMin, hallMax);
-    pSurf room = !Box::boxCorners(roomMin, roomMax);
-    pSurf boud = !Box::boxCorners(boudMin, boudMax);
+    pSurf hall = !BoxBandTexture::boxCorners(hallMin, hallMax,
+        hallMin + glm::dvec3(0, 0, 1.0), glm::dvec3(0, 1.4, 0), glm::dvec3(0, 0, 1.4));
+    pSurf boud = !BoxBandTexture::boxCorners(boudMin, boudMax,
+        boudMin + glm::dvec3(0, 0, 1.0), glm::dvec3(0, 0.84, 0), glm::dvec3(0, 0, 0.8));
+    pSurf room = !BoxBandTexture::boxCorners(roomMin, roomMax,
+        roomMin + glm::dvec3(0, 0, 0.346), glm::dvec3(0, 1.1, 0), glm::dvec3(0, 0, 0.778));
+
+    pSurf hallInner = Surface::shell(hall);
+    Surface::translate(hallInner, glm::dvec3(0.0, -wallThickness.y*2, 0.0));
+    pSurf boudInner = Surface::shell(boud);
+    Surface::translate(boudInner, glm::dvec3(-wallThickness.x*2, wallThickness.y*2, 0.0));
 
     pSurf hallEntrance = !Box::boxPosDims(glm::dvec3(boxMax.x, boxMax.y/2.0, 0.0), doorDim);
     pSurf roomEntrance = !Box::boxPosDims(glm::dvec3(boxMin.y, boxMin.y/2.0, 0.0), doorDim);
@@ -181,23 +189,27 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
         crossWindowHole & longWindowHole;
 
     pSurf boundStripWallSurf = createHoleStrippedWall(
-        glm::dvec3(boxDia.x / 2.0, wallThickness.y, porticoTop - porticoTh),
+        glm::dvec3(boxDia.x / 2.0, 1.0, porticoTop - porticoTh),
         0.35, 0.35, 0.35, 0.70);
 
     pSurf ynegStripWall = Surface::shell(boundStripWallSurf);
     Surface::translate(ynegStripWall, glm::dvec3(boxMax.x/2.0, boxMin.y+wallThickness.y/2.0, 0));
+    ynegStripWall = ynegStripWall & box & boudInner;
     pSurf xposStripWall = Surface::shell(boundStripWallSurf);
     Surface::rotate(xposStripWall, -glm::pi<double>()/2.0, glm::dvec3(0, 0, 1));
     Surface::translate(xposStripWall, glm::dvec3(boxMax.x-wallThickness.x/2.0, boxMin.y/2.0, 0));
+    xposStripWall = xposStripWall & box & boudInner;
 
 
     pSurf floorStripWallSurf = createHoleStrippedWall(
-        glm::dvec3(boxDia.x / 2.0, wallThickness.y, boxMax.z/2.0),
+        glm::dvec3(boxDia.x / 2.0, 1.0, boxMax.z/2.0),
         0.35, 0.35, 0.35, 0.0);
     pSurf hallStripWall = SurfaceShell::shell(floorStripWallSurf);
     Surface::translate(hallStripWall, glm::dvec3(boxMax.x/2.0, boxMax.y-wallThickness.x/2.0, 0));
+    hallStripWall = hallStripWall & box & hallInner;
     pSurf roomStripWall = SurfaceShell::shell(floorStripWallSurf);
     Surface::translate(roomStripWall, glm::dvec3(boxMin.x/2.0, boxMax.y-wallThickness.x/2.0, 0));
+    roomStripWall = roomStripWall & box & room;
 
     pCoat stageCoat = coating::createClearCoat(1.0);
     stageSurf->setCoating(stageCoat);
@@ -206,13 +218,51 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     hallStripWall->setCoating(stageCoat);
     roomStripWall->setCoating(stageCoat);
 
-    pMat stageMat = material::createInsulator(glm::dvec3(0.7), 1.45, 1.0, 1.0);
+    glm::dvec3 stageColor = glm::dvec3(0.7);
+    pMat stageMat = material::createInsulator(stageColor, 1.45, 1.0, 1.0);
     stageSurf->setInnerMaterial(stageMat);
     xposStripWall->setInnerMaterial(stageMat);
     ynegStripWall->setInnerMaterial(stageMat);
     hallStripWall->setInnerMaterial(stageMat);
     roomStripWall->setInnerMaterial(stageMat);
 
+    auto pHallWallpaperCoat = new TexturedStdCoating();
+    pHallWallpaperCoat->setPaintColorTexName(textureRoot + "SmallEmeraldTiles.png");
+    pHallWallpaperCoat->setDefaultPaintColor(glm::dvec4(stageColor, 1.0));
+    pHallWallpaperCoat->setTexFilter(ESamplerFilter::LINEAR);
+    pHallWallpaperCoat->setTexWrapper(ESamplerWrapper::REPEAT);
+    pHallWallpaperCoat->setDefaultRoughness(1.0);
+    pCoat hallWallpaperCoat = pCoat(pHallWallpaperCoat);
+    hallInner->setCoating(hallWallpaperCoat);
+    hall->setCoating(hallWallpaperCoat);
+
+    auto pBoudWallpaperCoat = new TexturedStdCoating();
+    pBoudWallpaperCoat->setPaintColorTexName(textureRoot + "RedVelourWallpaper.png");
+    pBoudWallpaperCoat->setDefaultPaintColor(glm::dvec4(stageColor, 1.0));
+    pBoudWallpaperCoat->setTexFilter(ESamplerFilter::LINEAR);
+    pBoudWallpaperCoat->setTexWrapper(ESamplerWrapper::REPEAT);
+    pBoudWallpaperCoat->setDefaultRoughness(1.0);
+    pCoat boudWallpaperCoat = pCoat(pBoudWallpaperCoat);
+    boudInner->setCoating(boudWallpaperCoat);
+    boud->setCoating(boudWallpaperCoat);
+
+    auto pRoomWallpaperCoat = new TexturedStdCoating();
+    pRoomWallpaperCoat->setPaintColorTexName(textureRoot + "TilesZellige.png");
+    pRoomWallpaperCoat->setDefaultPaintColor(glm::dvec4(stageColor, 1.0));
+    pRoomWallpaperCoat->setTexFilter(ESamplerFilter::LINEAR);
+    pRoomWallpaperCoat->setTexWrapper(ESamplerWrapper::REPEAT);
+    pRoomWallpaperCoat->setDefaultRoughness(1.0);
+    pCoat roomWallpaperCoat = pCoat(pRoomWallpaperCoat);
+    room->setCoating(roomWallpaperCoat);
+
+    auto pOutsideBrickCoat = new TexturedStdCoating();
+    pOutsideBrickCoat->setPaintColorTexName(textureRoot + "BrickLargePaintedUni.png");
+    pOutsideBrickCoat->setDefaultPaintColor(glm::dvec4(stageColor, 1.0));
+    pOutsideBrickCoat->setTexFilter(ESamplerFilter::LINEAR);
+    pOutsideBrickCoat->setTexWrapper(ESamplerWrapper::REPEAT);
+    pOutsideBrickCoat->setDefaultRoughness(1.0);
+    pCoat outsideBrickCoat = pCoat(pOutsideBrickCoat);
+    box->setCoating(outsideBrickCoat);
 
     pZone stageZone(new StageZone("Stage Zone"));
     stageSet->addSubzone(stageZone);
@@ -283,8 +333,10 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     pSurf roofSurf = roofBox & (roofEstUpSurf & roofWestUpSurf) &
                                 (roofEstDownSurf |roofWestDownSurf);
 
-    pSurf roofStuffingSurf = Box::boxPosDims(glm::dvec3(0, 0, boxMax.z + (roofRaise+roofDrop) / 2.0),
-                                             glm::dvec3(boxDia.x, boxDia.y, (roofRaise+roofDrop)));
+    pSurf roofStuffingSurf = BoxBandTexture::boxPosDims(
+        glm::dvec3(0, 0, boxMax.z + (roofRaise+roofDrop) / 2.0),
+        glm::dvec3(boxDia.x, boxDia.y, (roofRaise+roofDrop)),
+        boxMin, glm::dvec3(10/6.0, 0, 0), glm::dvec3(0, 0, 40/6.0));
     roofStuffingSurf = roofStuffingSurf & !SurfaceShell::shell(roofEstDownSurf | roofWestDownSurf);
 
 
@@ -336,7 +388,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     pProp roofStuffProp(new Prop("Roof Stuff"));
     roofStuffProp->addSurface(roofStuffingSurf);
     roofStuffProp->setInnerMaterial(stageMat);
-    roofStuffProp->setCoating(stageCoat);
+    roofStuffProp->setCoating(outsideBrickCoat);
 
     pZone roofTopZone(new StageZone("Roof Top Zone"));
     roofTopZone->addProp(roofStuffProp);
@@ -512,39 +564,35 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     double posterLength = boxDia.z / 2 - wallThickness.z * 2.0;
     double posterEpsilon = 0.002;
 
-    pSurf herbieSextantSurf = BoxTexture::boxPosDims(glm::dvec3(),
+    pSurf herbieSextantSurf = BoxSideTexture::boxPosDims(glm::dvec3(),
         glm::dvec3(posterLength, posterEpsilon, posterLength),
         glm::dvec3(posterLength/2.0, 0, -posterLength * 3.0/2.0),
         glm::dvec3(-posterLength*2.0, 0, 0),
-        glm::dvec3(0, 0, posterLength*2.0),
-        true);
+        glm::dvec3(0, 0, posterLength*2.0));
     Surface::translate(herbieSextantSurf, glm::dvec3(
         boxMax.x / 2.0, boxMax.y + posterEpsilon * 10.0, boxMax.z * 0.72));
 
-    pSurf herbieCrossingsSurf = BoxTexture::boxPosDims(glm::dvec3(),
+    pSurf herbieCrossingsSurf = BoxSideTexture::boxPosDims(glm::dvec3(),
         glm::dvec3(posterLength, posterEpsilon, posterLength),
         glm::dvec3(posterLength * 3.0/2.0, 0, -posterLength * 3.0/2.0),
         glm::dvec3(-posterLength*2.0, 0, 0),
-        glm::dvec3(0, 0, posterLength*2.0),
-        true);
+        glm::dvec3(0, 0, posterLength*2.0));
     Surface::translate(herbieCrossingsSurf, glm::dvec3(
         boxMin.x / 2.0,  boxMax.y + posterEpsilon * 10.0,  boxMax.z * 0.72));
 
-    pSurf bitchesBrewSurf = BoxTexture::boxPosDims(glm::dvec3(),
+    pSurf bitchesBrewSurf = BoxSideTexture::boxPosDims(glm::dvec3(),
         glm::dvec3(posterLength*2.0, posterEpsilon, posterLength),
         glm::dvec3(-posterLength, 0, -posterLength / 2.0),
         glm::dvec3(posterLength*2.0, 0, 0),
-        glm::dvec3(0, 0, posterLength*2.0),
-        true);
+        glm::dvec3(0, 0, posterLength*2.0));
     Surface::translate(bitchesBrewSurf, glm::dvec3(
         boxMin.x / 2.0,  boxMin.y - posterEpsilon * 10.0,  boxMax.z * 0.72));
 
-    pSurf dessinCocoSurf = BoxTexture::boxPosDims(glm::dvec3(),
+    pSurf dessinCocoSurf = BoxSideTexture::boxPosDims(glm::dvec3(),
         glm::dvec3(posterLength*7.0/4, posterEpsilon, posterLength*3.0/4),
         glm::dvec3(posterLength/2.0, 0, -posterLength*3/8.0),
         glm::dvec3(-posterLength*3/4.0, 0, 0),
-        glm::dvec3(0, 0, posterLength*3/4.0),
-        true);
+        glm::dvec3(0, 0, posterLength*3/4.0));
     Surface::translate(dessinCocoSurf, glm::dvec3(
         boxMin.x / 2.0,  boxMin.y + wallThickness.y + posterEpsilon * 10.0,  boxMax.z * 0.72));
 
