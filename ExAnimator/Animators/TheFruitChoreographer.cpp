@@ -248,6 +248,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
 
     auto pRoomWallpaperCoat = new TexturedStdCoating();
     pRoomWallpaperCoat->setPaintColorTexName(textureRoot + "TilesZellige.png");
+    pRoomWallpaperCoat->setRoughnessTexName(textureRoot + "TilesZellige_gloss.png");
     pRoomWallpaperCoat->setDefaultPaintColor(glm::dvec4(stageColor, 1.0));
     pRoomWallpaperCoat->setTexFilter(ESamplerFilter::LINEAR);
     pRoomWallpaperCoat->setTexWrapper(ESamplerWrapper::REPEAT);
@@ -256,7 +257,8 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     room->setCoating(roomWallpaperCoat);
 
     auto pOutsideBrickCoat = new TexturedStdCoating();
-    pOutsideBrickCoat->setPaintColorTexName(textureRoot + "BrickLargePaintedUni.png");
+    pOutsideBrickCoat->setPaintColorTexName(textureRoot + "BrickLargePainted.png");
+    pOutsideBrickCoat->setRoughnessTexName(textureRoot + "BrickLargePainted_gloss.png");
     pOutsideBrickCoat->setDefaultPaintColor(glm::dvec4(stageColor, 1.0));
     pOutsideBrickCoat->setTexFilter(ESamplerFilter::LINEAR);
     pOutsideBrickCoat->setTexWrapper(ESamplerWrapper::REPEAT);
