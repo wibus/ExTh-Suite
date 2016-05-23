@@ -117,7 +117,7 @@ void TheFruitChoreographer::update(double dt)
         double refHour = 17.73;
         glm::dvec3 lastPos(-2.5, -1.5, 0.8);
         glm::dvec3 lastHole(5.0, -4.6, 1.8);
-        glm::dvec3 sunAxis = glm::normalize(glm::dvec3(1, 2, 0.2));
+        glm::dvec3 sunAxis = glm::normalize(glm::dvec3(1, 2.55, 0.2));
         glm::dvec4 lastDir(glm::normalize(lastPos - lastHole), 0.0);
         double sunRot = (_pathModel->dayTime->value(t) - refHour) * glm::pi<double>() / 12.0;
         glm::dvec3 sunDir = glm::dvec3(glm::rotate(glm::dmat4(), sunRot, sunAxis) * lastDir);

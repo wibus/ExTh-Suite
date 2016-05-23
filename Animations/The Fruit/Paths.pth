@@ -1439,7 +1439,7 @@
             {
                 "CtrlPts": [
                     2.5,
-                    8
+                    6
                 ],
                 "Duration": 2,
                 "Type": "LinearPath"
