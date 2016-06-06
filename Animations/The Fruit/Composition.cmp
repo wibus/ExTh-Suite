@@ -1,6 +1,6 @@
 [
     {
-        "File": "00 Main title.png",
+        "File": "00 - Main title.png",
         "Name": "Main title",
         "begining": 3.2549999999999999,
         "duration": 8.3659999999999997,
@@ -18,12 +18,12 @@
         ]
     },
     {
-        "File": "01 Directed by.png",
+        "File": "01 - Directed by.png",
         "Name": "Directed by",
-        "begining": 12.804,
+        "begining": 12.048,
         "duration": 17.164999999999999,
         "fade-in": 13.102,
-        "fade-out": 19.344000000000001,
+        "fade-out": 18.344000000000001,
         "in-color": [
             255,
             255,
@@ -36,12 +36,12 @@
         ]
     },
     {
-        "File": "02 Music by.png",
+        "File": "02 - Music by.png",
         "Name": "Music by",
-        "begining": 23.777999999999999,
-        "duration": 23.777999999999999,
-        "fade-in": 23.777999999999999,
-        "fade-out": 23.777999999999999,
+        "begining": 18.344000000000001,
+        "duration": 22.399999999999999,
+        "fade-in": 19.344000000000001,
+        "fade-out": 23.399999999999999,
         "in-color": [
             255,
             255,
@@ -54,7 +54,7 @@
         ]
     },
     {
-        "File": "03 Prologue.png",
+        "File": "03 - Prologue.png",
         "Name": "Prologue",
         "begining": 23.777999999999999,
         "duration": 34.515000000000001,
@@ -75,9 +75,9 @@
         "File": "[Animation]",
         "Name": "[Animation]",
         "begining": 37.079999999999998,
-        "duration": 129.80000000000001,
+        "duration": 132,
         "fade-in": 38.549999999999997,
-        "fade-out": 130.80000000000001,
+        "fade-out": 134.08000000000001,
         "in-color": [
             255,
             255,
@@ -90,11 +90,11 @@
         ]
     },
     {
-        "File": "05 Epilogue.png",
+        "File": "05 - Epilogue.png",
         "Name": "Epilogue",
-        "begining": 131.69,
+        "begining": 135,
         "duration": 156.56999999999999,
-        "fade-in": 132.94,
+        "fade-in": 137,
         "fade-out": 161.49000000000001,
         "in-color": [
             0,
@@ -108,12 +108,12 @@
         ]
     },
     {
-        "File": "06 Artworks.png",
+        "File": "06 - Artworks.png",
         "Name": "Artworks",
         "begining": 165,
-        "duration": 183,
+        "duration": 173,
         "fade-in": 167,
-        "fade-out": 185,
+        "fade-out": 174,
         "in-color": [
             0,
             0,
@@ -126,30 +126,12 @@
         ]
     },
     {
-        "File": "07 GNU.png",
-        "Name": "GNU",
-        "begining": 187,
-        "duration": 205,
-        "fade-in": 189,
-        "fade-out": 207,
-        "in-color": [
-            0,
-            0,
-            0
-        ],
-        "out-color": [
-            0,
-            0,
-            0
-        ]
-    },
-    {
-        "File": "08 Made with.png",
+        "File": "07 - Made with.png",
         "Name": "Made with",
-        "begining": 209,
-        "duration": 227,
-        "fade-in": 211,
-        "fade-out": 229,
+        "begining": 175,
+        "duration": 183,
+        "fade-in": 177,
+        "fade-out": 185,
         "in-color": [
             0,
             0,

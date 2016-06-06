@@ -14,6 +14,7 @@
 
 #include "Section.h"
 #include "Serializer.h"
+#include "Processor.h"
 
 using namespace std;
 
@@ -25,6 +26,8 @@ const QString COMPOSITION_FILE = "Composition.cmp";
 ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ExCompositorWindow),
+    _processor(new Processor(glm::ivec2(960, 540),
+                             glm::ivec2(1260, 720))),
     _currentSection(nullptr),
     _imageLabel(nullptr),
     _currentPixmap(nullptr)
@@ -34,6 +37,8 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
     _sectionLayout = new QVBoxLayout();
     ui->sectionGroup->setLayout(_sectionLayout);
     _sectionLayout->addStretch();
+
+    _processor->show();
 
     loadProject();
     _sections.front()->radio->setChecked(true);
@@ -59,6 +64,8 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
     ui->imageScrollArea->setWidget(_imageLabel);
 
     frameChanged(0);
+
+    move(0, 0);
 }
 
 ExCompositorWindow::~ExCompositorWindow()
@@ -105,7 +112,7 @@ void ExCompositorWindow::frameChanged(int frame)
             filters << QString("%1*").arg(animFrame, 4, 10, QChar('0'));
 
             QDir dir(QDir::current());
-            dir.cd("frames");
+            dir.cd(ANIMATION_ROOT + "frames");
             QStringList dirs = dir.entryList(filters);
 
             if(dirs.size() > 0)
@@ -116,6 +123,25 @@ void ExCompositorWindow::frameChanged(int frame)
             {
                 qDebug() << dir.absolutePath() << filters.at(0);
                 _currentPixmap = new QPixmap(1280, 720);
+            }
+
+            if(false){
+                QStringList filmFilters;
+                filmFilters << QString("%1").arg(animFrame, 4, 10, QChar('0'));
+
+                QDir filmDir(QDir::current());
+                filmDir.cd(ANIMATION_ROOT + "films");
+                QStringList filmDirList = filmDir.entryList(filmFilters);
+
+                if(filmDirList.size() == 1)
+                {
+                    QString filmName = ANIMATION_ROOT + "films/"+filmDirList.at(0);
+                    _processor->feed(filmName.toStdString());
+                }
+                else
+                {
+                    qDebug() << filmDir.absolutePath() << filmFilters.at(0);
+                }
             }
         }
         else
@@ -311,7 +337,7 @@ void ExCompositorWindow::loadProject()
 void ExCompositorWindow::saveProject()
 {
     Serializer serializer;
-    serializer.write(_sections, COMPOSITION_FILE);
+    serializer.write(_sections, ANIMATION_ROOT + COMPOSITION_FILE);
 }
 
 void ExCompositorWindow::addSection(QLayout* layout, Section& section)
@@ -336,13 +362,14 @@ void ExCompositorWindow::updateTimeLine()
 void ExCompositorWindow::generateComposites()
 {
     int frameCount = ui->frameSpin->maximum();
-    for(int frame=1043; frame <= 1043; ++frame)
+    for(int frame=0; frame <= frameCount; ++frame)
     {
         frameChanged(frame);
 
         if(_currentPixmap)
         {
-            QFile file(QString("composites/%1.png").arg(frame, 4, 10, QChar('0')));
+            QFile file(QString(ANIMATION_ROOT + "composites/%1.png")
+                       .arg(frame, 4, 10, QChar('0')));
             file.open(QIODevice::WriteOnly);
 
             _currentPixmap->save(&file, "PNG", 80);
@@ -350,4 +377,10 @@ void ExCompositorWindow::generateComposites()
             QCoreApplication::processEvents();
         }
     }
+}
+
+void ExCompositorWindow::closeEvent(QCloseEvent* e)
+{
+    QMainWindow::closeEvent(e);
+    _processor.reset();
 }

@@ -25,7 +25,7 @@ using namespace cellar;
 using namespace prop3;
 
 
-const std::string RECORD_OUPUT_PREFIX = "CpuRaytracing/Animations/";
+const std::string RECORD_OUPUT_PREFIX = "";
 
 
 void TheFruitChoreographer::update(double dt)
@@ -157,9 +157,7 @@ std::string TheFruitChoreographer::currentFilm() const
 {
     if(!_cameraIsFree)
     {
-        std::string filmsDir =
-                getSceneDocument().sceneName() + "/" +
-                getSceneDocument().outputFilmDirectory() + "/";
+        std::string filmsDir = getSceneDocument().getAnimationFilmsDirectory() + "/";
         QString fileName = (RECORD_OUPUT_PREFIX + filmsDir).c_str();
         fileName += QString("%1").arg(_animCurrFrame, 4, 10, QChar('0'));
 
@@ -268,9 +266,7 @@ std::shared_ptr<PathModel> TheFruitChoreographer::pathModel() const
 
 void TheFruitChoreographer::saveCurrentFrame()
 {
-    std::string framesDir =
-            getSceneDocument().sceneName() + "/" +
-            getSceneDocument().outputFrameDirectory() + "/";
+    std::string framesDir = getSceneDocument().getAnimationFramesDirectory() + "/";
     QString fileName = (RECORD_OUPUT_PREFIX + framesDir).c_str();
 
     fileName += QString("%1").arg(_animCurrFrame, 4, 10, QChar('0'));

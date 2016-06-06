@@ -12,7 +12,8 @@ FIND_PACKAGE(ExperimentalTheatre REQUIRED)
 
 # Global
 SET(ExCompositor_LIBRARIES
-    ${ExTh_LIBRARIES})
+    ${ExTh_LIBRARIES}
+    GLU)
 SET(ExCompositor_INCLUDE_DIRS
     ${ExCompositor_SRC_DIR}
     ${ExTh_INCLUDE_DIRS})

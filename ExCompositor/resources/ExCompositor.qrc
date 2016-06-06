@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/ExCompositor">
+        <file>shaders/Fullscreen.vert</file>
+        <file>shaders/Tonemapping.frag</file>
+        <file>shaders/BloomBlend.frag</file>
+        <file>shaders/BloomBlur.frag</file>
+    </qresource>
+</RCC>

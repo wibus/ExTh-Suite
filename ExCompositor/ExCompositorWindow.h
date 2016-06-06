@@ -13,6 +13,7 @@ class ExCompositorWindow;
 }
 
 class Section;
+class Processor;
 
 
 class ExCompositorWindow : public QMainWindow
@@ -48,8 +49,11 @@ protected:
 
     void generateComposites();
 
+    void closeEvent(QCloseEvent* e);
+
 private:
     Ui::ExCompositorWindow *ui;
+    std::shared_ptr<Processor> _processor;
     std::vector<std::shared_ptr<Section>> _sections;
     std::shared_ptr<Section> _currentSection;
     QVBoxLayout* _sectionLayout;
