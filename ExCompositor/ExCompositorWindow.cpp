@@ -125,7 +125,7 @@ void ExCompositorWindow::frameChanged(int frame)
                 _currentPixmap = new QPixmap(1280, 720);
             }
 
-            if(false){
+            if(true){
                 QStringList filmFilters;
                 filmFilters << QString("%1").arg(animFrame, 4, 10, QChar('0'));
 

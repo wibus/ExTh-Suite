@@ -44,11 +44,17 @@ PostProdManager::PostProdManager(Ui::ExAnimatorGui* ui) :
     connect(_ui->temperatureDefaultBtn, &QPushButton::clicked,
             this,                       &PostProdManager::temperatureDefaultClicked);
 
-    connect(_ui->contrastSlider, &QSlider::valueChanged,
+    connect(_ui->contrastSpin, (void (QDoubleSpinBox::*)(double)) &QDoubleSpinBox::valueChanged,
             this,                &PostProdManager::contrastChanged);
 
-    connect(_ui->luminositySlider, &QSlider::valueChanged,
-            this,                  &PostProdManager::luminosityChanged);
+    connect(_ui->middleGraySpin, (void (QDoubleSpinBox::*)(double)) &QDoubleSpinBox::valueChanged,
+            this,                  &PostProdManager::middleGrayChanged);
+
+    connect(_ui->acesTonemappingCheck, &QCheckBox::toggled,
+            this,                  &PostProdManager::acesTonemmapingChanged);
+
+    connect(_ui->gammaSpin, (void (QDoubleSpinBox::*)(double)) &QDoubleSpinBox::valueChanged,
+            this,                  &PostProdManager::gammaChanged);
 
     connect(_ui->equalizeHistogramButton, &QPushButton::clicked,
             this,            &PostProdManager::equalizeHistogram);
@@ -78,8 +84,10 @@ void PostProdManager::setPostProdUnit(
     activateLowPassChecked(_ui->activateLowpassCheck->checkState());
     temperatureChanged(_ui->temperatureSpin->value());
     temperatureDefaultClicked();
-    contrastChanged(_ui->contrastSlider->value());
-    luminosityChanged(_ui->luminositySlider->value());
+    contrastChanged(_ui->contrastSpin->value());
+    middleGrayChanged(_ui->middleGraySpin->value());
+    acesTonemmapingChanged(_ui->acesTonemappingCheck->isChecked());
+    gammaChanged(_ui->gammaSpin->value());
 }
 
 void PostProdManager::activateLowPassChecked(int state)
@@ -138,20 +146,24 @@ void PostProdManager::temperatureDefaultClicked()
         prop3::GlPostProdUnit::DEFAULT_WHITE_TEMPERATURE);
 }
 
-void PostProdManager::contrastChanged(int contrast)
+void PostProdManager::contrastChanged(double contrast)
 {
-    float minusOneToOne = computeContrastFactor(contrast);
-    _ui->contrastLabel->setText(
-        QString::number((int)(minusOneToOne*100)) + '%');
-    _unitBackend->setImageContrast(minusOneToOne);
+    _unitBackend->setImageContrast(contrast);
 }
 
-void PostProdManager::luminosityChanged(int luminosity)
+void PostProdManager::middleGrayChanged(double middleGray)
 {
-    float zeroToOne = computeLuminosityFactor(luminosity);
-    _ui->luminosityLabel->setText(
-        QString::number((double)zeroToOne, 'g', 2));
-    _unitBackend->setImageLuminosity(zeroToOne);
+    _unitBackend->setImageMiddleGray(middleGray);
+}
+
+void PostProdManager::acesTonemmapingChanged(bool isActive)
+{
+    _unitBackend->setAcesTonemappingActive(isActive);
+}
+
+void PostProdManager::gammaChanged(double gamma)
+{
+    _unitBackend->setImageGamma(gamma);
 }
 
 void PostProdManager::equalizeHistogram()
@@ -174,29 +186,19 @@ void PostProdManager::equalizeHistogram()
     _unitBackend->getEqualizedImage(lumi, cont);
 
 
-    _ui->luminositySlider->setValue(lumi * 50 + 50);
-    _ui->contrastSlider->setValue(cont * 50);
+    _ui->middleGraySpin->setValue(lumi);
+    _ui->contrastSpin->setValue(cont);
 }
 
 void PostProdManager::resetHistogram()
 {
-    _ui->luminositySlider->setValue(50);
-    _ui->contrastSlider->setValue(50);
+    _ui->middleGraySpin->setValue(0.5);
+    _ui->contrastSpin->setValue(1);
 }
 
 void PostProdManager::saveOutputImage()
 {
     _unitBackend->saveOutputImage();
-}
-
-float PostProdManager::computeLuminosityFactor(int luminosity)
-{
-    return (luminosity - 50) / 50.0f;
-}
-
-float PostProdManager::computeContrastFactor(int contrast)
-{
-    return contrast / 50.0f;
 }
 
 float PostProdManager::computeAdaptativeFactor(int factor)

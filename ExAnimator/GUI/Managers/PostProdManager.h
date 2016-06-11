@@ -36,15 +36,15 @@ private slots:
     virtual void adaptativeFilteringFactorChanged(int factor);
     virtual void temperatureChanged(int kelvin);
     virtual void temperatureDefaultClicked();
-    virtual void contrastChanged(int contrast);
-    virtual void luminosityChanged(int luminosity);
+    virtual void contrastChanged(double contrast);
+    virtual void middleGrayChanged(double middleGray);
+    virtual void acesTonemmapingChanged(bool isActive);
+    virtual void gammaChanged(double gamma);
     virtual void equalizeHistogram();
     virtual void resetHistogram();
     virtual void saveOutputImage();
 
 private:
-    static float computeLuminosityFactor(int luminosity);
-    static float computeContrastFactor(int contrast);
     static float computeAdaptativeFactor(int factor);
     static void updateLowpassKernelTable(QTableWidget* widget, const float* kernel);
 
