@@ -39,6 +39,7 @@ private slots:
     virtual void contrastChanged(double contrast);
     virtual void middleGrayChanged(double middleGray);
     virtual void acesTonemmapingChanged(bool isActive);
+    virtual void exposureGainChanged(double exposure);
     virtual void gammaChanged(double gamma);
     virtual void equalizeHistogram();
     virtual void resetHistogram();

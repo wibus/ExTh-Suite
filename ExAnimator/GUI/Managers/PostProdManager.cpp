@@ -44,11 +44,14 @@ PostProdManager::PostProdManager(Ui::ExAnimatorGui* ui) :
     connect(_ui->temperatureDefaultBtn, &QPushButton::clicked,
             this,                       &PostProdManager::temperatureDefaultClicked);
 
-    connect(_ui->contrastSpin, (void (QDoubleSpinBox::*)(double)) &QDoubleSpinBox::valueChanged,
-            this,                &PostProdManager::contrastChanged);
+    connect(_ui->exposureGainSpin, (void (QDoubleSpinBox::*)(double)) &QDoubleSpinBox::valueChanged,
+            this,                  &PostProdManager::exposureGainChanged);
 
     connect(_ui->middleGraySpin, (void (QDoubleSpinBox::*)(double)) &QDoubleSpinBox::valueChanged,
             this,                  &PostProdManager::middleGrayChanged);
+
+    connect(_ui->contrastSpin, (void (QDoubleSpinBox::*)(double)) &QDoubleSpinBox::valueChanged,
+            this,                &PostProdManager::contrastChanged);
 
     connect(_ui->acesTonemappingCheck, &QCheckBox::toggled,
             this,                  &PostProdManager::acesTonemmapingChanged);
@@ -84,6 +87,7 @@ void PostProdManager::setPostProdUnit(
     activateLowPassChecked(_ui->activateLowpassCheck->checkState());
     temperatureChanged(_ui->temperatureSpin->value());
     temperatureDefaultClicked();
+    exposureGainChanged(_ui->exposureGainSpin->value());
     contrastChanged(_ui->contrastSpin->value());
     middleGrayChanged(_ui->middleGraySpin->value());
     acesTonemmapingChanged(_ui->acesTonemappingCheck->isChecked());
@@ -159,6 +163,11 @@ void PostProdManager::middleGrayChanged(double middleGray)
 void PostProdManager::acesTonemmapingChanged(bool isActive)
 {
     _unitBackend->setAcesTonemappingActive(isActive);
+}
+
+void PostProdManager::exposureGainChanged(double exposure)
+{
+    _unitBackend->setExposureGain(glm::vec3(exposure));
 }
 
 void PostProdManager::gammaChanged(double gamma)

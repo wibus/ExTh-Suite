@@ -637,6 +637,11 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Sky</string>
+         </attribute>
+        </widget>
        </widget>
       </item>
       <item>
@@ -1001,42 +1006,42 @@
              <string>Histogram</string>
             </property>
             <layout class="QFormLayout" name="formLayout_10">
-             <item row="5" column="0">
+             <item row="6" column="0">
               <widget class="QPushButton" name="equalizeHistogramButton">
                <property name="text">
                 <string>Equalize</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
+             <item row="6" column="1">
               <widget class="QPushButton" name="resetHistogramButton">
                <property name="text">
                 <string>Reset</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="middleGrayLabel">
                <property name="text">
                 <string>Middle gray</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="4" column="0">
               <widget class="QLabel" name="contrastLabel">
                <property name="text">
                 <string>Contrast</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="5" column="0">
               <widget class="QLabel" name="gammaLabel">
                <property name="text">
                 <string>Gamma</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
+             <item row="5" column="1">
               <widget class="QDoubleSpinBox" name="gammaSpin">
                <property name="minimum">
                 <double>0.100000000000000</double>
@@ -1058,11 +1063,11 @@
                 <string>ACES filmic tonemapping</string>
                </property>
                <property name="checked">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="4" column="1">
               <widget class="QDoubleSpinBox" name="contrastSpin">
                <property name="suffix">
                 <string/>
@@ -1084,7 +1089,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="3" column="1">
               <widget class="QDoubleSpinBox" name="middleGraySpin">
                <property name="minimum">
                 <double>-20.000000000000000</double>
@@ -1097,6 +1102,23 @@
                </property>
                <property name="value">
                 <double>0.500000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="exposureGainLabel">
+               <property name="text">
+                <string>Exposure</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QDoubleSpinBox" name="exposureGainSpin">
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
