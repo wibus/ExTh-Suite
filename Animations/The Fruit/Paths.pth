@@ -1416,30 +1416,30 @@
         "Paths": [
             {
                 "CtrlPts": [
-                    6
+                    10
                 ],
                 "Duration": 29.329999999999998,
                 "Type": "PointPath"
             },
             {
                 "CtrlPts": [
-                    6,
-                    2.5
+                    10,
+                    5
                 ],
                 "Duration": 0.13,
                 "Type": "LinearPath"
             },
             {
                 "CtrlPts": [
-                    2.5
+                    5
                 ],
                 "Duration": 8.2899999999999991,
                 "Type": "PointPath"
             },
             {
                 "CtrlPts": [
-                    2.5,
-                    6
+                    5,
+                    10
                 ],
                 "Duration": 2,
                 "Type": "LinearPath"

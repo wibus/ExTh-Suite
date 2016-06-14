@@ -211,7 +211,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     Surface::translate(roomStripWall, glm::dvec3(boxMin.x/2.0, boxMax.y-wallThickness.x/2.0, 0));
     roomStripWall = roomStripWall & box & room;
 
-    pCoat stageCoat = coating::createClearCoat(1.0);
+    pCoat stageCoat = coating::createClearCoat(0.90);
     stageSurf->setCoating(stageCoat);
     xposStripWall->setCoating(stageCoat);
     ynegStripWall->setCoating(stageCoat);
@@ -817,7 +817,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
         glm::dvec3(workTablePos.x, workTablePos.y - workTableDims.y / 4.0, workTableDims.z));
 
     pMat bowlMat = material::createInsulator(
-        glm::dvec3(0.95, 0.75, 0.72),
+        glm::dvec3(0.95, 0.20, 0.20),
         material::GLASS_REFRACTIVE_INDEX,
         0.975,
         0.0);
@@ -1035,14 +1035,6 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
 
 
 
-    pCoat theFruitCoat = coating::createClearCoat(0.01);
-    pMat theFruitMat = material::createInsulator(
-        glm::dvec3(1.0, 0.6, 0.48), 1.3, 0.5, 0.1);
-
-    pMat babyMat = material::SILVER;
-    pCoat babyCoat = coating::createClearPaint(
-        glm::dvec3(1.0), 0.0, 0.8);
-
     ///////////////
     // Sculpture //
     ///////////////
@@ -1061,11 +1053,17 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
         flowerSurf = flowerSurf | petalSurf;
     }
 
+    pMat flowerMat = material::createInsulator(glm::dvec3(0.95, 0.30, 0.25), 1.2, 0.95, 1.0);
+    pCoat floawerCoat = coating::createClearCoat(1.0);
+
     flowerSurf = flowerSurf & !Sphere::sphere(glm::dvec3(0.0, 0.0, 0.9), 0.65);
     flowerSurf = flowerSurf & Plane::plane(glm::dvec3(0, 0, -1), glm::dvec3(0, 0, 0.001));
-    flowerSurf->setInnerMaterial(material::createInsulator(glm::dvec3(0.95, 0.60, 0.55), 1.2, 0.95, 1.0));
-    flowerSurf->setCoating(coating::createClearCoat(1.0));
+    flowerSurf->setInnerMaterial(flowerMat);
+    flowerSurf->setCoating(floawerCoat);
 
+    pMat babyMat = material::SILVER;
+    pCoat babyCoat = coating::createClearPaint(
+        glm::dvec3(1.0), 0.0, 0.8);
 
     pSurf pearlSurf = Sphere::sphere(glm::dvec3(0.0, 0.0, 0.9), 0.63);
     pearlSurf->setInnerMaterial(babyMat);
@@ -1193,6 +1191,10 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     ///////////////
     // The Fruit //
     ///////////////
+
+    pCoat theFruitCoat = coating::createClearCoat(0.01);
+    pMat theFruitMat = material::createInsulator(
+        glm::dvec3(0.97, 0.3, 0.28), 1.3, 0.5, 0.1);
 
     _theFruitHeight = 1.6;
     _theFruitPosition = glm::dvec3(-6.0, -7.0, 0.0);

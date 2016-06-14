@@ -41,7 +41,7 @@ private slots:
     virtual void acesTonemmapingChanged(bool isActive);
     virtual void exposureGainChanged(double exposure);
     virtual void gammaChanged(double gamma);
-    virtual void equalizeHistogram();
+    virtual void autoExpose();
     virtual void resetHistogram();
     virtual void saveOutputImage();
 

@@ -8,7 +8,7 @@ install_manifest.txt
 
 # Animations
 frames
-films
+films*
 titles*
 composites
 *.mp4

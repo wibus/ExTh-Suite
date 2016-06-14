@@ -59,8 +59,8 @@ PostProdManager::PostProdManager(Ui::ExAnimatorGui* ui) :
     connect(_ui->gammaSpin, (void (QDoubleSpinBox::*)(double)) &QDoubleSpinBox::valueChanged,
             this,                  &PostProdManager::gammaChanged);
 
-    connect(_ui->equalizeHistogramButton, &QPushButton::clicked,
-            this,            &PostProdManager::equalizeHistogram);
+    connect(_ui->autoExposeButton, &QPushButton::clicked,
+            this,            &PostProdManager::autoExpose);
 
     connect(_ui->resetHistogramButton, &QPushButton::clicked,
             this,            &PostProdManager::resetHistogram);
@@ -175,32 +175,15 @@ void PostProdManager::gammaChanged(double gamma)
     _unitBackend->setImageGamma(gamma);
 }
 
-void PostProdManager::equalizeHistogram()
+void PostProdManager::autoExpose()
 {
-    /*
-    glm::dvec3 minComp;
-    glm::dvec3 maxComp;
-    _unitBackend->fetchImageMinAndMax(
-        minComp, maxComp);
-
-    double minVal = glm::max(glm::max(minComp.r, minComp.g), minComp.b);
-    double maxVal = glm::min(glm::min(maxComp.r, maxComp.g), maxComp.b);
-    maxVal = glm::min(maxVal, 2.0);
-
-    double lumi =  0.5 - (minVal + maxVal)*0.5;
-    double cont = 1.0 / (maxVal - minVal);
-    */
-
-    double lumi, cont;
-    _unitBackend->getEqualizedImage(lumi, cont);
-
-
-    _ui->middleGraySpin->setValue(lumi);
-    _ui->contrastSpin->setValue(cont);
+    _ui->exposureGainSpin->setValue(
+        _unitBackend->getAutoExposure(0.60));
 }
 
 void PostProdManager::resetHistogram()
 {
+    _ui->exposureGainSpin->setValue(1.0);
     _ui->middleGraySpin->setValue(0.5);
     _ui->contrastSpin->setValue(1);
 }
