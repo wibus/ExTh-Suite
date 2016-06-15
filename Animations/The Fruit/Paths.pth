@@ -1233,7 +1233,7 @@
                 "CtrlPts": [
                     [
                         -200,
-                        -400,
+                        -360,
                         50
                     ],
                     [
@@ -1262,19 +1262,19 @@
             },
             {
                 "CtrlPts": [
+                    8.4075000000000006,
                     8.5999999999999996,
-                    20
+                    19,
+                    19
                 ],
                 "Duration": 14,
-                "Type": "LinearPath"
-            },
-            {
-                "CtrlPts": [
-                    20,
-                    20
-                ],
-                "Duration": 0,
-                "Type": "LinearPath"
+                "Type": "CubicSplinePath",
+                "Weights": [
+                    1,
+                    1,
+                    1,
+                    1
+                ]
             }
         ],
         "Type": "CompositePath"

@@ -211,7 +211,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     Surface::translate(roomStripWall, glm::dvec3(boxMin.x/2.0, boxMax.y-wallThickness.x/2.0, 0));
     roomStripWall = roomStripWall & box & room;
 
-    pCoat stageCoat = coating::createClearCoat(0.90);
+    pCoat stageCoat = coating::CLEAR_ROUGH;
     stageSurf->setCoating(stageCoat);
     xposStripWall->setCoating(stageCoat);
     ynegStripWall->setCoating(stageCoat);
@@ -603,6 +603,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     pPosterCoat->setDefaultPaintColor(glm::dvec4(0.2, 0.2, 0.2, 1.0));
     pPosterCoat->setTexFilter(ESamplerFilter::LINEAR);
     pPosterCoat->setTexWrapper(ESamplerWrapper::CLAMP);
+    pPosterCoat->setPaintRefractiveIndex(1.2);
     pPosterCoat->setDefaultRoughness(1.0);
     pCoat posterCoat = pCoat(pPosterCoat);
 
@@ -611,6 +612,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     pDessinCocoCoat->setDefaultPaintColor(glm::dvec4(0.2, 0.2, 0.2, 1.0));
     pDessinCocoCoat->setTexFilter(ESamplerFilter::LINEAR);
     pDessinCocoCoat->setTexWrapper(ESamplerWrapper::CLAMP);
+    pDessinCocoCoat->setPaintRefractiveIndex(1.2);
     pDessinCocoCoat->setDefaultRoughness(1.0);
     pCoat dessinCocoCoat = pCoat(pDessinCocoCoat);
 

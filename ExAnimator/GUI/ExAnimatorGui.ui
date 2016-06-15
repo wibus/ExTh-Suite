@@ -688,7 +688,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="postProdTab">
          <attribute name="title">
@@ -1348,6 +1348,9 @@
            <property name="suffix">
             <string>/ 0</string>
            </property>
+           <property name="maximum">
+            <number>1500</number>
+           </property>
            <property name="value">
             <number>0</number>
            </property>
@@ -1365,12 +1368,18 @@
            <property name="suffix">
             <string>/ 0</string>
            </property>
+           <property name="value">
+            <number>99</number>
+           </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
         <widget class="QSlider" name="animFrameSlider">
+         <property name="maximum">
+          <number>1500</number>
+         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>

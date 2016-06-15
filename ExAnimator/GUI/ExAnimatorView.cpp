@@ -59,12 +59,17 @@ void ExAnimatorView::installArtDirectors(scaena::Play& play)
 void ExAnimatorView::setup()
 {
     _artDirector2D->resize(width(), height());
+
+    connect(_pathManager.get(), &PathManager::freeCamera,
+            _cameraManager.get(), &CameraManager::onFreeCamera);
+    _pathManager->setStageSet(_stageSet);
     _cameraManager->setRaytracer(_raytracerServer);
+    _pathManager->setChoreographer(_choreographer);
+
     _serverManager->setRaytracer(_raytracerServer);
     _postProdManager->setPostProdUnit(_raytracerServer);
     _animationManager->setChoreographer(_choreographer);
     _animationManager->setRaytracer(_raytracerServer);
-
 
     connect(_timelineManager.get(), &TimelineManager::startSoundtrack,
             _animationManager.get(), &AnimationManager::startSoundtrack);
@@ -73,10 +78,4 @@ void ExAnimatorView::setup()
     connect(_pathManager.get(), &PathManager::pathChanged,
             _timelineManager.get(), &TimelineManager::onPathChanged);
     _timelineManager->setChoreographer(_choreographer);
-
-
-    connect(_pathManager.get(), &PathManager::freeCamera,
-            _cameraManager.get(), &CameraManager::onFreeCamera);
-    _pathManager->setStageSet(_stageSet);
-    _pathManager->setChoreographer(_choreographer);
 }

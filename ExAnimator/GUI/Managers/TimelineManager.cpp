@@ -56,6 +56,7 @@ void TimelineManager::setChoreographer(
 {
     _choreographer = choreographer;
 
+    onPathChanged();
     animTimeOffset(0 /*unused*/);
     animFps(_ui->animFpsSpin->value());
     animFrame(_ui->animFrameSpin->value());
