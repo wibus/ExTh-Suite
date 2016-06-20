@@ -178,7 +178,7 @@ void PostProdManager::gammaChanged(double gamma)
 void PostProdManager::autoExpose()
 {
     _ui->exposureGainSpin->setValue(
-        _unitBackend->getAutoExposure(0.60));
+        _unitBackend->getAutoExposure(0.55));
 }
 
 void PostProdManager::resetHistogram()
