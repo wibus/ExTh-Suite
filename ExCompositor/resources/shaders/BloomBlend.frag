@@ -1,6 +1,6 @@
 #version 440
 
-uniform sampler2D BloomBase;
+uniform sampler2D Tonemap;
 uniform sampler2D BloomBlur;
 
 in vec2 texCoord;
@@ -63,6 +63,6 @@ void main()
     blur += conv(textureOffset(BloomBlur, texCoord, ivec2(0, 12)) , 24);
 
 
-    vec3 base = texture(BloomBase, texCoord).rgb;
+    vec3 base = texture(Tonemap, texCoord).rgb;
     FragColor = vec4(min(base + blur, vec3(1 + 8.0/256.0)), 1.0);
 }

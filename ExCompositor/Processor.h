@@ -46,15 +46,33 @@ private:
     std::shared_ptr<prop3::Film> _film;
     std::shared_ptr<cellar::Image> _image;
 
+    glm::ivec2 _fireFliesResolution;
+    glm::ivec2 _luminanceResolution;
+    glm::ivec2 _tonemappingResolution;
+    glm::ivec2 _bloomBlurResolution;
+    glm::ivec2 _bloomBlendResolution;
+    glm::ivec2 _gammatizeResolution;
+
+    std::shared_ptr<cellar::GlProgram> _fireFliesPass;
+    std::shared_ptr<cellar::GlProgram> _luminancePass;
+    std::shared_ptr<cellar::GlProgram> _tonemappingPass;
     std::shared_ptr<cellar::GlProgram> _bloomBlurPass;
     std::shared_ptr<cellar::GlProgram> _bloomBlendPass;
-    std::shared_ptr<cellar::GlProgram> _tonemappingPass;
+    std::shared_ptr<cellar::GlProgram> _gammatizePass;
 
-    GLuint _frameBufferId;
-    GLuint _depthBufferId;
-    GLuint _colorBufferRawId;
-    GLuint _colorBufferTonemapedId;
-    GLuint _colorBufferBlurId;
+    GLuint _colorBufferSrcId;
+
+    GLuint _colorBufferFireFliesId;
+    GLuint _frameBufferFireFliesId;
+    GLuint _colorBufferLuminanceId;
+    GLuint _frameBufferLuminanceId;
+    GLuint _colorBufferTonemappedId;
+    GLuint _frameBufferTonemapedId;
+    GLuint _colorBufferBloomBlurId;
+    GLuint _frameBufferBloomBlurId;
+    GLuint _colorBufferBloomBlendId;
+    GLuint _frameBufferBloomBlendId;
+
     GLuint _vao;
     GLuint _vbo;
 };

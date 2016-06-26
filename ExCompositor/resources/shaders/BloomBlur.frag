@@ -1,6 +1,6 @@
 #version 440
 
-uniform sampler2D BloomBase;
+uniform sampler2D Tonemap;
 
 in vec2 texCoord;
 
@@ -26,43 +26,40 @@ const float kernel[] = {
 
 vec3 conv(in vec4 texel, in int kId)
 {
-    vec3 lum = texel.rgb;
-    float blurIntensity = length(lum);
-    blurIntensity = max(blurIntensity - 0.75, 0) * 1.0;
-    lum *= blurIntensity * blurIntensity * blurIntensity;
-
-    return lum * kernel[kId];
+    vec3 color = texel.rgb;
+    float lum = dot(color, vec3(0.2126, 0.7152, 0.0722));
+    return color * max(log(lum + 0.25), 0) * kernel[kId];
 }
 
 void main()
 {
-    vec3 blur = conv(texture(BloomBase, texCoord), 12);
+    vec3 blur = conv(texture(Tonemap, texCoord), 12);
 
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-12, 0)), 0);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-11, 0)), 1);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-10, 0)), 2);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-9, 0)) , 3);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-8, 0)) , 4);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-7, 0)) , 5);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-6, 0)) , 6);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-5, 0)) , 7);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-4, 0)) , 8);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-3, 0)) , 9);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-2, 0)) , 10);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(-1, 0)) , 11);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-12, 0)), 0);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-11, 0)), 1);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-10, 0)), 2);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-9, 0)) , 3);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-8, 0)) , 4);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-7, 0)) , 5);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-6, 0)) , 6);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-5, 0)) , 7);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-4, 0)) , 8);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-3, 0)) , 9);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-2, 0)) , 10);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(-1, 0)) , 11);
 
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(1, 0))  , 13);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(2, 0))  , 14);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(3, 0))  , 15);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(4, 0))  , 16);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(5, 0))  , 17);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(6, 0))  , 18);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(7, 0))  , 19);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(8, 0))  , 20);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(9, 0))  , 21);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(10, 0)) , 22);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(11, 0)) , 23);
-    blur += conv(textureOffset(BloomBase, texCoord, ivec2(12, 0)) , 24);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(1, 0))  , 13);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(2, 0))  , 14);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(3, 0))  , 15);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(4, 0))  , 16);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(5, 0))  , 17);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(6, 0))  , 18);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(7, 0))  , 19);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(8, 0))  , 20);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(9, 0))  , 21);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(10, 0)) , 22);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(11, 0)) , 23);
+    blur += conv(textureOffset(Tonemap, texCoord, ivec2(12, 0)) , 24);
 
 
     BloomBlur = vec4(blur, 1.0);

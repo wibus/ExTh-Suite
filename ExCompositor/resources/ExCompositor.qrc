@@ -4,5 +4,8 @@
         <file>shaders/Tonemapping.frag</file>
         <file>shaders/BloomBlend.frag</file>
         <file>shaders/BloomBlur.frag</file>
+        <file>shaders/FireFlies.frag</file>
+        <file>shaders/Gammatize.frag</file>
+        <file>shaders/Luminance.frag</file>
     </qresource>
 </RCC>

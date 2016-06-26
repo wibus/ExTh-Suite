@@ -22,9 +22,12 @@ SET(ExCompositor_SOURCES
 ## Shaders ##
 SET(ExCompositor_SHADERS
     ${ExCompositor_SRC_DIR}/resources/shaders/Fullscreen.vert
+    ${ExCompositor_SRC_DIR}/resources/shaders/FireFlies.frag
+    ${ExCompositor_SRC_DIR}/resources/shaders/Luminance.frag
+    ${ExCompositor_SRC_DIR}/resources/shaders/Tonemapping.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/BloomBlur.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/BloomBlend.frag
-    ${ExCompositor_SRC_DIR}/resources/shaders/Tonemapping.frag)
+    ${ExCompositor_SRC_DIR}/resources/shaders/Gammatize.frag)
 
 
 

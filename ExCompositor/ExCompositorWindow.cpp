@@ -130,12 +130,12 @@ void ExCompositorWindow::frameChanged(int frame)
                 filmFilters << QString("%1").arg(animFrame, 4, 10, QChar('0'));
 
                 QDir filmDir(QDir::current());
-                filmDir.cd(ANIMATION_ROOT + "films");
+                filmDir.cd(ANIMATION_ROOT + "films_v2");
                 QStringList filmDirList = filmDir.entryList(filmFilters);
 
                 if(filmDirList.size() == 1)
                 {
-                    QString filmName = ANIMATION_ROOT + "films/"+filmDirList.at(0);
+                    QString filmName = ANIMATION_ROOT + "films_v2/"+filmDirList.at(0);
                     _processor->feed(filmName.toStdString());
                 }
                 else

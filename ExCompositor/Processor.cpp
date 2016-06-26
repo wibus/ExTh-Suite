@@ -31,11 +31,7 @@ Processor::Processor(const glm::ivec2& srcResolution,
     _srcResolution(srcResolution),
     _dstResolution(dstResolution),
     _film(new ConvergentFilm()),
-    _image(new Image()),
-    _frameBufferId(0),
-    _depthBufferId(0),
-    _colorBufferRawId(0),
-    _colorBufferBlurId(0)
+    _image(new Image())
 {
 
 }
@@ -61,37 +57,63 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
     const std::vector<glm::vec3>& color =
         _film->colorBuffer(Film::ColorOutput::ALBEDO);
 
-    glBindTexture(GL_TEXTURE_2D, _colorBufferRawId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferSrcId);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _srcResolution.x, _srcResolution.y,
                  0, GL_RGB, GL_FLOAT, color.data());
 
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferBloomBlendId);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferBloomBlurId);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferTonemappedId);
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferBlurId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferLuminanceId);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferTonemapedId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferFireFliesId);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferRawId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferSrcId);
 
     glDisable(GL_DEPTH_TEST);
     glBindVertexArray(_vao);
 
-//    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferId);
-//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-//                           GL_TEXTURE_2D, _colorBufferTonemapedId, 0);
+    // TODO mipmaps
+
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferFireFliesId);
+    glViewport(0, 0, _fireFliesResolution.x, _fireFliesResolution.y);
+    _fireFliesPass->pushProgram();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _fireFliesPass->popProgram();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferLuminanceId);
+    glViewport(0, 0, _luminanceResolution.x, _luminanceResolution.y);
+    _luminancePass->pushProgram();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _luminancePass->popProgram();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferTonemapedId);
+    glViewport(0, 0, _tonemappingResolution.x, _tonemappingResolution.y);
     _tonemappingPass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _tonemappingPass->popProgram();
 
-//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-//                           GL_TEXTURE_2D, _colorBufferBlurId, 0);
-//    _bloomBlurPass->pushProgram();
-//    glDrawArrays(GL_TRIANGLES, 0, 3);
-//    _bloomBlurPass->popProgram();
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferBloomBlurId);
+    glViewport(0, 0, _bloomBlurResolution.x, _bloomBlurResolution.y);
+    _bloomBlurPass->pushProgram();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _bloomBlurPass->popProgram();
 
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//    _bloomBlendPass->pushProgram();
-//    glDrawArrays(GL_TRIANGLES, 0, 3);
-//    _bloomBlendPass->popProgram();
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferBloomBlendId);
+    glViewport(0, 0, _bloomBlendResolution.x, _bloomBlendResolution.y);
+    _bloomBlendPass->pushProgram();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _bloomBlendPass->popProgram();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, _gammatizeResolution.x, _gammatizeResolution.y);
+    _gammatizePass->pushProgram();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _gammatizePass->popProgram();
 
 
     glBindVertexArray(0);
@@ -136,9 +158,8 @@ void Processor::initializeGL()
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 
-
-    glGenTextures(1, &_colorBufferRawId);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferRawId);
+    glGenTextures(1, &_colorBufferSrcId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferSrcId);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -146,51 +167,94 @@ void Processor::initializeGL()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _srcResolution.x, _srcResolution.y,
                  0, GL_RGB, GL_FLOAT, nullptr);
 
-    glGenTextures(1, &_colorBufferTonemapedId);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferTonemapedId);
+    _fireFliesResolution = _srcResolution;
+    glGenTextures(1, &_colorBufferFireFliesId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferFireFliesId);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _srcResolution.x, _srcResolution.y,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _fireFliesResolution.x, _fireFliesResolution.y,
                  0, GL_RGB, GL_FLOAT, nullptr);
 
-    glGenTextures(1, &_colorBufferBlurId);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferBlurId);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _srcResolution.x, _srcResolution.y,
-                 0, GL_RGB, GL_FLOAT, nullptr);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-
-    glGenRenderbuffers(1, &_depthBufferId);
-    glBindRenderbuffer(GL_RENDERBUFFER, _depthBufferId);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32,
-                          _srcResolution.x, _srcResolution.y);
-
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-
-    glGenFramebuffers(1, &_frameBufferId);
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferId);
+    glGenFramebuffers(1, &_frameBufferFireFliesId);
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferFireFliesId);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                           GL_TEXTURE_2D, _colorBufferBlurId, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                              GL_RENDERBUFFER, _depthBufferId);
-
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if(status != GL_FRAMEBUFFER_COMPLETE)
-    {
-        getLog().postMessage(new Message('E', true,
-            "Framebuffer is broken... " + std::to_string(status), "Processor"));
-        return ;
-    }
-
+                           GL_TEXTURE_2D, _colorBufferFireFliesId, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    _luminanceResolution = _srcResolution / 8;
+    glGenTextures(1, &_colorBufferLuminanceId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferLuminanceId);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, _luminanceResolution.x, _luminanceResolution.y,
+                 0, GL_RGB, GL_FLOAT, nullptr);
+
+    glGenFramebuffers(1, &_frameBufferLuminanceId);
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferLuminanceId);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, _colorBufferLuminanceId, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    _tonemappingResolution = _srcResolution;
+    glGenTextures(1, &_colorBufferTonemappedId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferTonemappedId);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _tonemappingResolution.x, _tonemappingResolution.y,
+                 0, GL_RGB, GL_FLOAT, nullptr);
+
+    glGenFramebuffers(1, &_frameBufferTonemapedId);
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferTonemapedId);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, _colorBufferTonemappedId, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    _bloomBlurResolution = _srcResolution;
+    glGenTextures(1, &_colorBufferBloomBlurId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferBloomBlurId);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _bloomBlurResolution.x, _bloomBlurResolution.y,
+                 0, GL_RGB, GL_FLOAT, nullptr);
+
+    glGenFramebuffers(1, &_frameBufferBloomBlurId);
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferBloomBlurId);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, _colorBufferBloomBlurId, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    _bloomBlendResolution = _srcResolution;
+    glGenTextures(1, &_colorBufferBloomBlendId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferBloomBlendId);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _bloomBlendResolution.x, _bloomBlendResolution.y,
+                 0, GL_RGB, GL_FLOAT, nullptr);
+
+    glGenFramebuffers(1, &_frameBufferBloomBlendId);
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferBloomBlendId);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, _colorBufferBloomBlendId, 0);
+
+
+    _gammatizeResolution = _dstResolution;
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 
     // Fullscreen triangle
@@ -212,13 +276,31 @@ void Processor::initializeGL()
 
 
     // Passes
+    _fireFliesPass.reset(new GlProgram());
+    _fireFliesPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
+    _fireFliesPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/FireFlies.frag");
+    _fireFliesPass->link();
+    _fireFliesPass->pushProgram();
+    _fireFliesPass->setInt("SourceImage", 0);
+    _fireFliesPass->setFloat("Threshold", 1.0f);
+    _fireFliesPass->popProgram();
+
+    _luminancePass.reset(new GlProgram());
+    _luminancePass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
+    _luminancePass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/Luminance.frag");
+    _luminancePass->link();
+    _luminancePass->pushProgram();
+    _luminancePass->setInt("FireFlies", 1);
+    _luminancePass->popProgram();
+
     _tonemappingPass.reset(new GlProgram());
     _tonemappingPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
     _tonemappingPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/Tonemapping.frag");
     _tonemappingPass->link();
     _tonemappingPass->pushProgram();
-    _tonemappingPass->setInt("SourceImage", 0);
-    _tonemappingPass->setFloat("MidGray", 0.5f);
+    _tonemappingPass->setInt("FireFlies", 1);
+    _tonemappingPass->setInt("Luminance", 2);
+    _tonemappingPass->setFloat("ExposureGain", 1.0f);
     _tonemappingPass->popProgram();
 
     _bloomBlurPass.reset(new GlProgram());
@@ -226,7 +308,7 @@ void Processor::initializeGL()
     _bloomBlurPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/BloomBlur.frag");
     _bloomBlurPass->link();
     _bloomBlurPass->pushProgram();
-    _bloomBlurPass->setInt("BloomBase", 1);
+    _bloomBlurPass->setInt("Tonemap", 3);
     _bloomBlurPass->popProgram();
 
     _bloomBlendPass.reset(new GlProgram());
@@ -234,9 +316,17 @@ void Processor::initializeGL()
     _bloomBlendPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/BloomBlend.frag");
     _bloomBlendPass->link();
     _bloomBlendPass->pushProgram();
-    _bloomBlendPass->setInt("BloomBase", 1);
-    _bloomBlendPass->setInt("BloomBlur", 2);
+    _bloomBlendPass->setInt("Tonemap", 3);
+    _bloomBlendPass->setInt("BloomBlur", 4);
     _bloomBlendPass->popProgram();
+
+    _gammatizePass.reset(new GlProgram());
+    _gammatizePass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
+    _gammatizePass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/Gammatize.frag");
+    _gammatizePass->link();
+    _gammatizePass->pushProgram();
+    _gammatizePass->setInt("Bloom", 5);
+    _gammatizePass->popProgram();
 
 
     // Make sure film's color buffer is set to albedo
