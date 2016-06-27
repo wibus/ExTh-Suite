@@ -2,10 +2,11 @@
     <qresource prefix="/ExCompositor">
         <file>shaders/Fullscreen.vert</file>
         <file>shaders/Tonemapping.frag</file>
-        <file>shaders/BloomBlend.frag</file>
-        <file>shaders/BloomBlur.frag</file>
         <file>shaders/FireFlies.frag</file>
         <file>shaders/Gammatize.frag</file>
         <file>shaders/Luminance.frag</file>
+        <file>shaders/BlurX.frag</file>
+        <file>shaders/BlurY.frag</file>
+        <file>shaders/MipmapSum.frag</file>
     </qresource>
 </RCC>

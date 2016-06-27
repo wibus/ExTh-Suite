@@ -40,6 +40,8 @@ protected:
     virtual void resizeGL(int w, int h) override;
     virtual void paintGL() override;
 
+    virtual void genFramebuffer(GLuint& frameId, GLuint& texId, const glm::ivec2& size, bool mipmap);
+
 private:
     glm::ivec2 _srcResolution;
     glm::ivec2 _dstResolution;
@@ -47,31 +49,35 @@ private:
     std::shared_ptr<cellar::Image> _image;
 
     glm::ivec2 _fireFliesResolution;
+    glm::ivec2 _blurXBaseResolution;
+    glm::ivec2 _blurYBaseResolution;
     glm::ivec2 _luminanceResolution;
+    glm::ivec2 _mipmapSumResolution;
     glm::ivec2 _tonemappingResolution;
-    glm::ivec2 _bloomBlurResolution;
-    glm::ivec2 _bloomBlendResolution;
     glm::ivec2 _gammatizeResolution;
 
+    std::shared_ptr<cellar::GlProgram> _blurXPass;
+    std::shared_ptr<cellar::GlProgram> _blurYPass;
     std::shared_ptr<cellar::GlProgram> _fireFliesPass;
     std::shared_ptr<cellar::GlProgram> _luminancePass;
+    std::shared_ptr<cellar::GlProgram> _mipmapSumPass;
     std::shared_ptr<cellar::GlProgram> _tonemappingPass;
-    std::shared_ptr<cellar::GlProgram> _bloomBlurPass;
-    std::shared_ptr<cellar::GlProgram> _bloomBlendPass;
     std::shared_ptr<cellar::GlProgram> _gammatizePass;
 
     GLuint _colorBufferSrcId;
 
     GLuint _colorBufferFireFliesId;
     GLuint _frameBufferFireFliesId;
+    GLuint _colorBufferBlurXBaseId;
+    GLuint _frameBufferBlurXBaseId;
+    GLuint _colorBufferBlurYBaseId;
+    GLuint _frameBufferBlurYBaseId;
     GLuint _colorBufferLuminanceId;
     GLuint _frameBufferLuminanceId;
+    GLuint _colorBufferMipMapSumId;
+    GLuint _frameBufferMipmapSumId;
     GLuint _colorBufferTonemappedId;
     GLuint _frameBufferTonemapedId;
-    GLuint _colorBufferBloomBlurId;
-    GLuint _frameBufferBloomBlurId;
-    GLuint _colorBufferBloomBlendId;
-    GLuint _frameBufferBloomBlendId;
 
     GLuint _vao;
     GLuint _vbo;
