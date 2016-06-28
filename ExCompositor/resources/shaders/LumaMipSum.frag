@@ -20,7 +20,7 @@ void main()
     float weightSum = 0.0;
     for(int i=0; i < LodCount; ++i)
     {
-        float invLogLuma = textureLod(Source, texCoord, i).r;
+        float invLogLuma = textureLod(Source, texCoord, i).a;
         float weight = 1.0 / (LodCount - i);
         mipsum += invLogLuma * weight;
         weightSum += weight;

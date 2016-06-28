@@ -18,5 +18,5 @@ void main()
 
     float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
     float invLogLuma = log( 1.0 / (luma + Aberration) );
-    FragColor = vec4(invLogLuma, 0.0, 0.0, 1.0);
+    FragColor = vec4(color, invLogLuma);
 }

@@ -40,7 +40,12 @@ protected:
     virtual void resizeGL(int w, int h) override;
     virtual void paintGL() override;
 
-    virtual void genFramebuffer(GLuint& frameId, GLuint& texId, const glm::ivec2& size, bool mipmap);
+    virtual void genFramebuffer(
+            GLuint& frameId,
+            GLuint& texId,
+            const glm::ivec2& size,
+            GLenum coponents,
+            bool mipmap);
 
 private:
     glm::ivec2 _srcResolution;
@@ -48,32 +53,28 @@ private:
     std::shared_ptr<prop3::Film> _film;
     std::shared_ptr<cellar::Image> _image;
 
-    glm::ivec2 _fireFliesResolution;
-    glm::ivec2 _bloomBrightResolution;
+    glm::ivec2 _denoiseResolution;
+    glm::ivec2 _preprocessResolution;
     glm::ivec2 _bloomMipSumResolution;
-    glm::ivec2 _luminanceResolution;
     glm::ivec2 _lumaMipSumResolution;
     glm::ivec2 _tonemappingResolution;
     glm::ivec2 _gammatizeResolution;
 
-    std::shared_ptr<cellar::GlProgram> _fireFliesPass;
-    std::shared_ptr<cellar::GlProgram> _bloomBrightPass;
+    std::shared_ptr<cellar::GlProgram> _denoisePass;
+    std::shared_ptr<cellar::GlProgram> _preprocessPass;
     std::shared_ptr<cellar::GlProgram> _bloomMipSumPass;
-    std::shared_ptr<cellar::GlProgram> _luminancePass;
     std::shared_ptr<cellar::GlProgram> _lumaMipSumPass;
     std::shared_ptr<cellar::GlProgram> _tonemappingPass;
     std::shared_ptr<cellar::GlProgram> _gammatizePass;
 
     GLuint _colorBufferSrcId;
 
-    GLuint _colorBufferFireFliesId;
-    GLuint _frameBufferFireFliesId;
-    GLuint _colorBufferBloomBrightId;
-    GLuint _frameBufferBloomBrightId;
+    GLuint _colorBufferDenoiseId;
+    GLuint _frameBufferDenoiseId;
+    GLuint _colorBufferPreprocessId;
+    GLuint _frameBufferPreprocessId;
     GLuint _colorBufferBloomMipSumId;
     GLuint _frameBufferBloomMipSumId;
-    GLuint _colorBufferLuminanceId;
-    GLuint _frameBufferLuminanceId;
     GLuint _colorBufferLumaMipSumId;
     GLuint _frameBufferLumaMipSumId;
     GLuint _colorBufferTonemappingId;
