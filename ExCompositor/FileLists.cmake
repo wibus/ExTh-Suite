@@ -21,12 +21,12 @@ SET(ExCompositor_SOURCES
 
 ## Shaders ##
 SET(ExCompositor_SHADERS
-    ${ExCompositor_SRC_DIR}/resources/shaders/BlurX.frag
-    ${ExCompositor_SRC_DIR}/resources/shaders/BlurY.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/Fullscreen.vert
     ${ExCompositor_SRC_DIR}/resources/shaders/FireFlies.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/Luminance.frag
-    ${ExCompositor_SRC_DIR}/resources/shaders/MipmapSum.frag
+    ${ExCompositor_SRC_DIR}/resources/shaders/LumaMipSum.frag
+    ${ExCompositor_SRC_DIR}/resources/shaders/BloomBright.frag
+    ${ExCompositor_SRC_DIR}/resources/shaders/BloomMipSum.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/Tonemapping.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/Gammatize.frag)
 

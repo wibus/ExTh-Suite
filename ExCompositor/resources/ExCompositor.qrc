@@ -5,8 +5,8 @@
         <file>shaders/FireFlies.frag</file>
         <file>shaders/Gammatize.frag</file>
         <file>shaders/Luminance.frag</file>
-        <file>shaders/BlurX.frag</file>
-        <file>shaders/BlurY.frag</file>
-        <file>shaders/MipmapSum.frag</file>
+        <file>shaders/BloomMipSum.frag</file>
+        <file>shaders/LumaMipSum.frag</file>
+        <file>shaders/BloomBright.frag</file>
     </qresource>
 </RCC>

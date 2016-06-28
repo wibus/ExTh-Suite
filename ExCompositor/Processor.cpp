@@ -63,19 +63,19 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
 
 
     glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferTonemappedId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferTonemappingId);
 
     glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferMipMapSumId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferBloomMipSumId);
 
     glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferLuminanceId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferBloomBrightId);
 
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferBlurYBaseId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferLumaMipSumId);
 
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferBlurXBaseId);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferLuminanceId);
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, _colorBufferFireFliesId);
@@ -86,8 +86,9 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
     glDisable(GL_DEPTH_TEST);
     glBindVertexArray(_vao);
 
-    // TODO mipmaps
 
+
+    // Fireflies
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferFireFliesId);
     glViewport(0, 0, _fireFliesResolution.x, _fireFliesResolution.y);
     _fireFliesPass->pushProgram();
@@ -95,19 +96,8 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
     _fireFliesPass->popProgram();
     glGenerateTextureMipmap(_colorBufferFireFliesId);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferBlurXBaseId);
-    glViewport(0, 0, _blurXBaseResolution.x, _blurXBaseResolution.y);
-    _blurXPass->pushProgram();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    _blurXPass->popProgram();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferBlurYBaseId);
-    glViewport(0, 0, _blurYBaseResolution.x, _blurYBaseResolution.y);
-    _blurYPass->pushProgram();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    _blurYPass->popProgram();
-
-
+    // Luminance
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferLuminanceId);
     glViewport(0, 0, _luminanceResolution.x, _luminanceResolution.y);
     _luminancePass->pushProgram();
@@ -115,25 +105,43 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
     _luminancePass->popProgram();
     glGenerateTextureMipmap(_colorBufferLuminanceId);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferMipmapSumId);
-    glViewport(0, 0, _mipmapSumResolution.x, _mipmapSumResolution.y);
-    _mipmapSumPass->pushProgram();
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferLumaMipSumId);
+    glViewport(0, 0, _lumaMipSumResolution.x, _lumaMipSumResolution.y);
+    _lumaMipSumPass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    _mipmapSumPass->popProgram();
+    _lumaMipSumPass->popProgram();
 
 
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferTonemapedId);
+    // Bloom
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferBloomBrightId);
+    glViewport(0, 0, _bloomBrightResolution.x, _bloomBrightResolution.y);
+    _bloomBrightPass->pushProgram();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _bloomBrightPass->popProgram();
+    glGenerateTextureMipmap(_colorBufferBloomBrightId);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferBloomMipSumId);
+    glViewport(0, 0, _bloomMipSumResolution.x, _bloomMipSumResolution.y);
+    _bloomMipSumPass->pushProgram();
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _bloomMipSumPass->popProgram();
+
+
+    // Tonemapping
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferTonemappingId);
     glViewport(0, 0, _tonemappingResolution.x, _tonemappingResolution.y);
     _tonemappingPass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _tonemappingPass->popProgram();
 
+
+    // Gammatize
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, _gammatizeResolution.x, _gammatizeResolution.y);
     _gammatizePass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _gammatizePass->popProgram();
-
+//*/
 
 
     glBindVertexArray(0);
@@ -188,6 +196,7 @@ void Processor::initializeGL()
                  0, GL_RGB, GL_FLOAT, nullptr);
 
 
+    // Fireflies
     _fireFliesResolution = _srcResolution;
     genFramebuffer(
         _frameBufferFireFliesId,
@@ -195,50 +204,61 @@ void Processor::initializeGL()
         _fireFliesResolution,
         true);
 
-    _blurXBaseResolution = _dstResolution / 2;
-    genFramebuffer(
-        _frameBufferBlurXBaseId,
-        _colorBufferBlurXBaseId,
-        _blurXBaseResolution,
-        false);
 
-    _blurYBaseResolution = _dstResolution / 2;
-    genFramebuffer(
-        _frameBufferBlurYBaseId,
-        _colorBufferBlurYBaseId,
-        _blurYBaseResolution,
-        false);
-
-
-    _luminanceResolution = _srcResolution / 2;
+    // Luminance
+    _luminanceResolution = _dstResolution / 2;
     genFramebuffer(
         _frameBufferLuminanceId,
         _colorBufferLuminanceId,
         _luminanceResolution,
         true);
 
-    _mipmapSumResolution = _srcResolution / 2;
+    _lumaMipSumResolution = _dstResolution / 2;
     genFramebuffer(
-        _frameBufferMipmapSumId,
-        _colorBufferMipMapSumId,
-        _mipmapSumResolution,
+        _frameBufferLumaMipSumId,
+        _colorBufferLumaMipSumId,
+        _lumaMipSumResolution,
         false);
 
+
+    // Bloom
+    _bloomBrightResolution = _dstResolution;
+    genFramebuffer(
+        _frameBufferBloomBrightId,
+        _colorBufferBloomBrightId,
+        _bloomBrightResolution,
+        true);
+
+    _bloomMipSumResolution = _dstResolution / 2;
+    genFramebuffer(
+        _frameBufferBloomMipSumId,
+        _colorBufferBloomMipSumId,
+        _bloomMipSumResolution,
+        false);
+
+
+    // Tonemapping
     _tonemappingResolution = _dstResolution;
     genFramebuffer(
-        _frameBufferTonemapedId,
-        _colorBufferTonemappedId,
+        _frameBufferTonemappingId,
+        _colorBufferTonemappingId,
         _tonemappingResolution,
         false);
 
 
+    // Gammatize
     _gammatizeResolution = _dstResolution;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    double w = _luminanceResolution.x;
-    double h = _luminanceResolution.y;
-    int lumaLod = glm::floor(glm::log2(glm::max(w, h)));
+
+    double bloomW = _bloomBrightResolution.x;
+    double bloomH = _bloomBrightResolution.y;
+    int bloomLod = 1 + glm::floor(glm::log2(glm::max(bloomW, bloomH)));
+
+    double lumaW = _luminanceResolution.x;
+    double lumaH = _luminanceResolution.y;
+    int lumaLod = 1 + glm::floor(glm::log2(glm::max(lumaW, lumaH)));
 
     // Passes
     _fireFliesPass.reset(new GlProgram());
@@ -250,38 +270,41 @@ void Processor::initializeGL()
     _fireFliesPass->setFloat("Threshold", 1.0f);
     _fireFliesPass->popProgram();
 
-    _blurXPass.reset(new GlProgram());
-    _blurXPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
-    _blurXPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/BlurX.frag");
-    _blurXPass->link();
-    _blurXPass->pushProgram();
-    _blurXPass->setInt("Source", 1);
-    _blurXPass->popProgram();
-
-    _blurYPass.reset(new GlProgram());
-    _blurYPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
-    _blurYPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/BlurY.frag");
-    _blurYPass->link();
-    _blurYPass->pushProgram();
-    _blurYPass->setInt("Source", 2);
-    _blurYPass->popProgram();
-
     _luminancePass.reset(new GlProgram());
     _luminancePass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
     _luminancePass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/Luminance.frag");
     _luminancePass->link();
     _luminancePass->pushProgram();
     _luminancePass->setInt("Source", 1);
+    _luminancePass->setFloat("Aberration", 0.1f);
     _luminancePass->popProgram();
 
-    _mipmapSumPass.reset(new GlProgram());
-    _mipmapSumPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
-    _mipmapSumPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/MipmapSum.frag");
-    _mipmapSumPass->link();
-    _mipmapSumPass->pushProgram();
-    _mipmapSumPass->setInt("LodCount", lumaLod);
-    _mipmapSumPass->setInt("Mipmaps", 4);
-    _mipmapSumPass->popProgram();
+    _lumaMipSumPass.reset(new GlProgram());
+    _lumaMipSumPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
+    _lumaMipSumPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/LumaMipSum.frag");
+    _lumaMipSumPass->link();
+    _lumaMipSumPass->pushProgram();
+    _lumaMipSumPass->setInt("Source", 2);
+    _lumaMipSumPass->setInt("LodCount", lumaLod);
+    _lumaMipSumPass->setFloat("Relaxation", 0.3f);
+    _lumaMipSumPass->popProgram();
+
+    _bloomBrightPass.reset(new GlProgram());
+    _bloomBrightPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
+    _bloomBrightPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/BloomBright.frag");
+    _bloomBrightPass->link();
+    _bloomBrightPass->pushProgram();
+    _bloomBrightPass->setInt("Source", 1);
+    _bloomBrightPass->popProgram();
+
+    _bloomMipSumPass.reset(new GlProgram());
+    _bloomMipSumPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
+    _bloomMipSumPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/BloomMipSum.frag");
+    _bloomMipSumPass->link();
+    _bloomMipSumPass->pushProgram();
+    _bloomMipSumPass->setInt("Source", 4);
+    _bloomMipSumPass->setInt("LodCount", bloomLod);
+    _bloomMipSumPass->popProgram();
 
     _tonemappingPass.reset(new GlProgram());
     _tonemappingPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
@@ -289,9 +312,10 @@ void Processor::initializeGL()
     _tonemappingPass->link();
     _tonemappingPass->pushProgram();
     _tonemappingPass->setInt("Source", 1);
-    _tonemappingPass->setInt("BaseBlur", 3);
-    _tonemappingPass->setInt("LumiBlur", 5);
-    _tonemappingPass->setFloat("ExposureGain", 1.0f);
+    _tonemappingPass->setInt("LumaBlur", 3);
+    _tonemappingPass->setInt("BloomBlur", 5);
+    _tonemappingPass->setFloat("ExposureGain", 0.26f);
+    _tonemappingPass->setFloat("BloomGain", 1.0f);
     _tonemappingPass->popProgram();
 
     _gammatizePass.reset(new GlProgram());
@@ -300,6 +324,7 @@ void Processor::initializeGL()
     _gammatizePass->link();
     _gammatizePass->pushProgram();
     _gammatizePass->setInt("Source", 6);
+    _gammatizePass->setFloat("Gamma", 2.0);
     _gammatizePass->popProgram();
 
 
