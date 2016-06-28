@@ -24,6 +24,7 @@ SET(ExCompositor_SHADERS
     ${ExCompositor_SRC_DIR}/resources/shaders/Fullscreen.vert
     ${ExCompositor_SRC_DIR}/resources/shaders/Denoise.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/Preprocess.frag
+    ${ExCompositor_SRC_DIR}/resources/shaders/MipmapBlur.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/MipmapSum.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/Tonemapping.frag
     ${ExCompositor_SRC_DIR}/resources/shaders/Gammatize.frag)

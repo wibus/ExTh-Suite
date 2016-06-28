@@ -62,11 +62,14 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
                  0, GL_RGB, GL_FLOAT, color.data());
 
 
-    glActiveTexture(GL_TEXTURE4);
+    glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, _colorBufferTonemappingId);
 
-    glActiveTexture(GL_TEXTURE3);
+    glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, _colorBufferMipmapSumId);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferMipmapBlurId);
 
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, _colorBufferPreprocessId);
@@ -83,42 +86,61 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
 
 
     // Denoise
+    _denoisePass->pushProgram();
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferDenoiseId);
     glViewport(0, 0, _denoiseResolution.x, _denoiseResolution.y);
-    _denoisePass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _denoisePass->popProgram();
 
 
     // Preprocessing
+    _preprocessPass->pushProgram();
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferPreprocessId);
     glViewport(0, 0, _preprocessResolution.x, _preprocessResolution.y);
-    _preprocessPass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _preprocessPass->popProgram();
     glGenerateTextureMipmap(_colorBufferPreprocessId);
 
 
+    // Mipmap blur
+    _mipmapBlurPass->pushProgram();
+    glm::ivec2 lodDimensions = _mipmapBlurResolution;
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferMipmapBlurId);
+    for(int lod=0; lod < _mipmapLodCount; ++lod)
+    {
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+            GL_TEXTURE_2D, _colorBufferMipmapBlurId, lod);
+
+        glViewport(0, 0, lodDimensions.x, lodDimensions.y);
+        _mipmapBlurPass->setInt("CurrentLod", lod);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        lodDimensions = glm::max(lodDimensions / 2, glm::ivec2(1));
+    }
+    _mipmapBlurPass->popProgram();
+
+
     // Mipmap sum
+    _mipmapSumPass->pushProgram();
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferMipmapSumId);
     glViewport(0, 0, _mipmapSumResolution.x, _mipmapSumResolution.y);
-    _mipmapSumPass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _mipmapSumPass->popProgram();
 
 
     // Tonemapping
+    _tonemappingPass->pushProgram();
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferTonemappingId);
     glViewport(0, 0, _tonemappingResolution.x, _tonemappingResolution.y);
-    _tonemappingPass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _tonemappingPass->popProgram();
 
 
     // Gammatize
+    _gammatizePass->pushProgram();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, _gammatizeResolution.x, _gammatizeResolution.y);
-    _gammatizePass->pushProgram();
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _gammatizePass->popProgram();
 //*/
@@ -196,6 +218,16 @@ void Processor::initializeGL()
         true);
 
 
+    // Mipmap blur
+    _mipmapBlurResolution = _dstResolution;
+    genFramebuffer(
+        _frameBufferMipmapBlurId,
+        _colorBufferMipmapBlurId,
+        _mipmapBlurResolution,
+        GL_RGBA32F,
+        true);
+
+
     // Mipmap sum
     _mipmapSumResolution = _dstResolution;
     genFramebuffer(
@@ -224,7 +256,7 @@ void Processor::initializeGL()
 
     double baseW = _preprocessResolution.x;
     double baseH = _preprocessResolution.y;
-    int lodCount = 1 + glm::floor(glm::log2(glm::max(baseW, baseH)));
+    _mipmapLodCount = 1 + glm::floor(glm::log2(glm::max(baseW, baseH)));
 
 
     // Passes
@@ -246,13 +278,22 @@ void Processor::initializeGL()
     _preprocessPass->setFloat("Aberration", 0.1f);
     _preprocessPass->popProgram();
 
+    _mipmapBlurPass.reset(new GlProgram());
+    _mipmapBlurPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
+    _mipmapBlurPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/MipmapBlur.frag");
+    _mipmapBlurPass->link();
+    _mipmapBlurPass->pushProgram();
+    _mipmapBlurPass->setInt("Source", 2);
+    _mipmapBlurPass->setInt("CurrentLod", 0);
+    _mipmapBlurPass->popProgram();
+
     _mipmapSumPass.reset(new GlProgram());
     _mipmapSumPass->addShader(GL_VERTEX_SHADER, ":/ExCompositor/shaders/Fullscreen.vert");
     _mipmapSumPass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/MipmapSum.frag");
     _mipmapSumPass->link();
     _mipmapSumPass->pushProgram();
-    _mipmapSumPass->setInt("Source", 2);
-    _mipmapSumPass->setInt("LodCount", lodCount);
+    _mipmapSumPass->setInt("Source", 3);
+    _mipmapSumPass->setInt("LodCount", _mipmapLodCount);
     _mipmapSumPass->setFloat("Relaxation", 0.3f);
     _mipmapSumPass->popProgram();
 
@@ -262,9 +303,9 @@ void Processor::initializeGL()
     _tonemappingPass->link();
     _tonemappingPass->pushProgram();
     _tonemappingPass->setInt("Source", 2);
-    _tonemappingPass->setInt("MipmapSum", 3);
-    _tonemappingPass->setFloat("ExposureGain", 0.26f);
-    _tonemappingPass->setFloat("BloomGain", 1.0f);
+    _tonemappingPass->setInt("MipmapSum", 4);
+    _tonemappingPass->setFloat("ExposureGain", 0.16f);
+    _tonemappingPass->setFloat("BloomGain", 1.2f);
     _tonemappingPass->popProgram();
 
     _gammatizePass.reset(new GlProgram());
@@ -272,7 +313,7 @@ void Processor::initializeGL()
     _gammatizePass->addShader(GL_FRAGMENT_SHADER, ":/ExCompositor/shaders/Gammatize.frag");
     _gammatizePass->link();
     _gammatizePass->pushProgram();
-    _gammatizePass->setInt("Source", 4);
+    _gammatizePass->setInt("Source", 5);
     _gammatizePass->setFloat("Gamma", 2.0);
     _gammatizePass->popProgram();
 

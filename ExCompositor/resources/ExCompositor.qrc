@@ -6,5 +6,6 @@
         <file>shaders/Denoise.frag</file>
         <file>shaders/Preprocess.frag</file>
         <file>shaders/MipmapSum.frag</file>
+        <file>shaders/MipmapBlur.frag</file>
     </qresource>
 </RCC>
