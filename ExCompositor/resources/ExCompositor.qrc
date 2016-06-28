@@ -3,9 +3,8 @@
         <file>shaders/Fullscreen.vert</file>
         <file>shaders/Tonemapping.frag</file>
         <file>shaders/Gammatize.frag</file>
-        <file>shaders/BloomMipSum.frag</file>
-        <file>shaders/LumaMipSum.frag</file>
         <file>shaders/Denoise.frag</file>
         <file>shaders/Preprocess.frag</file>
+        <file>shaders/MipmapSum.frag</file>
     </qresource>
 </RCC>

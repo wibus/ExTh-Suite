@@ -55,15 +55,13 @@ private:
 
     glm::ivec2 _denoiseResolution;
     glm::ivec2 _preprocessResolution;
-    glm::ivec2 _bloomMipSumResolution;
-    glm::ivec2 _lumaMipSumResolution;
+    glm::ivec2 _mipmapSumResolution;
     glm::ivec2 _tonemappingResolution;
     glm::ivec2 _gammatizeResolution;
 
     std::shared_ptr<cellar::GlProgram> _denoisePass;
     std::shared_ptr<cellar::GlProgram> _preprocessPass;
-    std::shared_ptr<cellar::GlProgram> _bloomMipSumPass;
-    std::shared_ptr<cellar::GlProgram> _lumaMipSumPass;
+    std::shared_ptr<cellar::GlProgram> _mipmapSumPass;
     std::shared_ptr<cellar::GlProgram> _tonemappingPass;
     std::shared_ptr<cellar::GlProgram> _gammatizePass;
 
@@ -73,10 +71,8 @@ private:
     GLuint _frameBufferDenoiseId;
     GLuint _colorBufferPreprocessId;
     GLuint _frameBufferPreprocessId;
-    GLuint _colorBufferBloomMipSumId;
-    GLuint _frameBufferBloomMipSumId;
-    GLuint _colorBufferLumaMipSumId;
-    GLuint _frameBufferLumaMipSumId;
+    GLuint _colorBufferMipmapSumId;
+    GLuint _frameBufferMipmapSumId;
     GLuint _colorBufferTonemappingId;
     GLuint _frameBufferTonemappingId;
 
