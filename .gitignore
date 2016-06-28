@@ -12,3 +12,5 @@ films*
 titles*
 composites
 *.mp4
+
+tests
