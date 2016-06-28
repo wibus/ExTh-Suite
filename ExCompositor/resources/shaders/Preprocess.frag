@@ -1,6 +1,7 @@
 #version 440
 
 uniform sampler2D Source;
+uniform float PreExpose;
 uniform float Aberration;
 
 in vec2 texCoord;
@@ -11,6 +12,8 @@ layout(location=0) out vec4 FragColor;
 void main()
 {
     vec3 color = texture(Source, texCoord).rgb;
+
+    color = color * PreExpose;
 
     // ABERRATION makes local tonemapping hard in low luminosity area
     // This mimics real eye limitations, but also makes, for very low luma,
