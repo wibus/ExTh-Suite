@@ -25,6 +25,8 @@ int main(int argc, char* argv[])
     act->addCharacter(character);
     play->appendAct(act);
 
+    play->setUpdateRate(10);
+
     // Build GUI
     ExRenderClientGui* window = new ExRenderClientGui(play);
     window->show();
