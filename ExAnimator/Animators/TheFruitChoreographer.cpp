@@ -797,7 +797,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
 
 
     pProp workTableProp(new Prop("Work Table"));
-    pMat workTableMat = material::createInsulator(glm::dvec3(0.4), 1.3, 1.0, 1.0);
+    pMat workTableMat = material::createInsulator(glm::dvec3(0.85), 1.3, 1.0, 1.0);
     pCoat workTableCoat = coating::createClearCoat(1.0);
     workTableSurf->setInnerMaterial(workTableMat);
     workTableSurf->setCoating(workTableCoat);
