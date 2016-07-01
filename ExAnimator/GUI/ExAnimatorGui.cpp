@@ -22,7 +22,7 @@ ExAnimatorGui::ExAnimatorGui(const std::shared_ptr<Play>& play) :
 {
     _ui->setupUi(this);
     QPoint center = QApplication::desktop()->availableGeometry(this).center();
-    move(center.x()-width()*0.5, center.y()-height()*0.5);
+    move(0, 0);
 
     _cameraManager.reset(new CameraManager(_ui));
     _serverManager.reset(new ServerManager(_ui));

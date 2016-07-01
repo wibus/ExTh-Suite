@@ -592,7 +592,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
 
     pSurf dessinCocoSurf = BoxSideTexture::boxPosDims(glm::dvec3(),
         glm::dvec3(posterLength*7.0/4, posterEpsilon, posterLength*3.0/4),
-        glm::dvec3(posterLength/2.0, 0, -posterLength*3/8.0),
+        glm::dvec3(posterLength/5.5, 0, -posterLength*3/8.0),
         glm::dvec3(-posterLength*3/4.0, 0, 0),
         glm::dvec3(0, 0, posterLength*3/4.0));
     Surface::translate(dessinCocoSurf, glm::dvec3(
@@ -603,7 +603,7 @@ void TheFruitChoreographer::setup(const std::shared_ptr<StageSet>& stageSet)
     pPosterCoat->setDefaultPaintColor(glm::dvec4(0.2, 0.2, 0.2, 1.0));
     pPosterCoat->setTexFilter(ESamplerFilter::LINEAR);
     pPosterCoat->setTexWrapper(ESamplerWrapper::CLAMP);
-    pPosterCoat->setPaintRefractiveIndex(1.2);
+    pPosterCoat->setPaintRefractiveIndex(1.35);
     pPosterCoat->setDefaultRoughness(1.0);
     pCoat posterCoat = pCoat(pPosterCoat);
 

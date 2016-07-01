@@ -275,6 +275,7 @@ void Processor::initializeGL()
     _preprocessPass->link();
     _preprocessPass->pushProgram();
     _preprocessPass->setInt("Source", 1);
+    _preprocessPass->setFloat("PreExpose", 4.0f);
     _preprocessPass->setFloat("Aberration", 0.1f);
     _preprocessPass->popProgram();
 
