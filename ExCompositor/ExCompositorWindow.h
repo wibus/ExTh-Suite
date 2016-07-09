@@ -47,7 +47,8 @@ protected:
     void addSection(QLayout* layout, Section& section);
     void updateTimeLine();
 
-    void generateComposites();
+    void play();
+    void generate();
 
     void closeEvent(QCloseEvent* e);
 

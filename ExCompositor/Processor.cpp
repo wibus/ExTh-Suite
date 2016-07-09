@@ -43,9 +43,9 @@ Processor::~Processor()
 
 bool Processor::feed(const std::string& filmName, bool useLastAsRef)
 {
-    //if(useLastAsRef)
-    //    _film->backupAsReferenceShot();
-    //else
+    if(useLastAsRef)
+        _film->backupAsReferenceShot();
+    else
         _film->clearReferenceShot();
 
     if(!_film->loadRawFilm(filmName))

@@ -30,7 +30,7 @@ public:
               const glm::ivec2& dstResolution);
     virtual ~Processor();
 
-    virtual bool feed(const std::string& filmName, bool useLastAsRef = true);
+    virtual bool feed(const std::string& filmName, bool useLastAsRef);
 
     virtual std::shared_ptr<cellar::Image> yield() const;
 

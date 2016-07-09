@@ -26,8 +26,8 @@ const QString COMPOSITION_FILE = "Composition.cmp";
 ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ExCompositorWindow),
-    _processor(new Processor(glm::ivec2(960, 540),
-                             glm::ivec2(1260, 720))),
+    _processor(new Processor(glm::ivec2(1280, 720),
+                             glm::ivec2(1280, 720))),
     _currentSection(nullptr),
     _imageLabel(nullptr),
     _currentPixmap(nullptr)
@@ -57,8 +57,10 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
             this, &ExCompositorWindow::loadProject);
     connect(ui->saveProjectButton, &QPushButton::clicked,
             this, &ExCompositorWindow::saveProject);
+    connect(ui->playButton, &QPushButton::clicked,
+            this, &ExCompositorWindow::play);
     connect(ui->generateButton, &QPushButton::clicked,
-            this, &ExCompositorWindow::generateComposites);
+            this, &ExCompositorWindow::generate);
 
     _imageLabel = new QLabel();
     ui->imageScrollArea->setWidget(_imageLabel);
@@ -125,24 +127,11 @@ void ExCompositorWindow::frameChanged(int frame)
                 _currentPixmap = new QPixmap(1280, 720);
             }
 
-            if(true){
-                QStringList filmFilters;
-                filmFilters << QString("%1").arg(animFrame, 4, 10, QChar('0'));
-
-                QString filmDirName = "films/";
-                QDir filmDir(QDir::current());
-                filmDir.cd(ANIMATION_ROOT + filmDirName);
-                QStringList filmDirList = filmDir.entryList(filmFilters);
-
-                if(true)//filmDirList.size() == 1)
-                {
-                    QString filmName = ANIMATION_ROOT + filmDirName + "Clouds.film";//filmDirList.at(0);
-                    _processor->feed(filmName.toStdString());
-                }
-                else
-                {
-                    qDebug() << filmDir.absolutePath() << filmFilters.at(0);
-                }
+            if(true)
+            {
+                QString filmName = ANIMATION_ROOT + "films/" +
+                    QString("%1").arg(animFrame, 4, 10, QChar('0'));
+                _processor->feed(filmName.toStdString(), true);
             }
         }
         else
@@ -360,10 +349,30 @@ void ExCompositorWindow::updateTimeLine()
     ui->frameSlider->setMaximum(frameCount);
 }
 
-void ExCompositorWindow::generateComposites()
+void ExCompositorWindow::play()
 {
+    int start = ui->frameSpin->value();
     int frameCount = ui->frameSpin->maximum();
-    for(int frame=0; frame <= frameCount; ++frame)
+    for(int frame=start; frame <= frameCount; ++frame)
+    {
+        frameChanged(frame);
+
+        QCoreApplication::processEvents();
+
+        if(!ui->playButton->isChecked())
+        {
+            break;
+        }
+    }
+
+    ui->playButton->setChecked(false);
+}
+
+void ExCompositorWindow::generate()
+{
+    int start = ui->frameSpin->value();
+    int frameCount = ui->frameSpin->maximum();
+    for(int frame=start; frame <= frameCount; ++frame)
     {
         frameChanged(frame);
 
@@ -376,8 +385,15 @@ void ExCompositorWindow::generateComposites()
             _currentPixmap->save(&file, "PNG", 80);
 
             QCoreApplication::processEvents();
+
+            if(!ui->generateButton->isChecked())
+            {
+                break;
+            }
         }
     }
+
+    ui->generateButton->setChecked(false);
 }
 
 void ExCompositorWindow::closeEvent(QCloseEvent* e)
