@@ -62,6 +62,32 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
     connect(ui->generateButton, &QPushButton::clicked,
             this, &ExCompositorWindow::generate);
 
+
+    // Shading
+    connect(ui->denoiseThresholdSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::denoiseThresholdChanged);
+    connect(ui->preExposureSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::preExposureChanged);
+    connect(ui->aberrationSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::aberrationChanged);
+    connect(ui->relaxationSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::relaxationChanged);
+    connect(ui->postExposureSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::postExposureChanged);
+    connect(ui->bloomSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::bloomChanged);
+    connect(ui->gammaSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::gammaChanged);
+
+    _processor->denoiseThresholdChanged(ui->denoiseThresholdSpin->value());
+    _processor->preExposureChanged(ui->preExposureSpin->value());
+    _processor->aberrationChanged(ui->aberrationSpin->value());
+    _processor->relaxationChanged(ui->relaxationSpin->value());
+    _processor->postExposureChanged(ui->postExposureSpin->value());
+    _processor->bloomChanged(ui->bloomSpin->value());
+    _processor->gammaChanged(ui->gammaSpin->value());
+
+
     _imageLabel = new QLabel();
     ui->imageScrollArea->setWidget(_imageLabel);
 

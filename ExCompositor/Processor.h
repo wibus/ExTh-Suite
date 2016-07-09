@@ -34,11 +34,24 @@ public:
 
     virtual std::shared_ptr<cellar::Image> yield() const;
 
+
+public slots:
+    void denoiseThresholdChanged(double threshold);
+    void preExposureChanged(double exposure);
+    void aberrationChanged(double aberration);
+    void relaxationChanged(double relaxation);
+    void postExposureChanged(double exposure);
+    void bloomChanged(double bloom);
+    void gammaChanged(double gamma);
+
+
 protected:
     // QGLWidget interface
     virtual void initializeGL() override;
     virtual void resizeGL(int w, int h) override;
     virtual void paintGL() override;
+
+    virtual void render();
 
     virtual void genFramebuffer(
             GLuint& frameId,

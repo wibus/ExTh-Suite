@@ -54,104 +54,69 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
             "Film not found: " + filmName, "Processor"));
     }
 
-    const std::vector<glm::vec3>& color =
-        _film->colorBuffer(Film::ColorOutput::ALBEDO);
-
-    glBindTexture(GL_TEXTURE_2D, _colorBufferSrcId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _srcResolution.x, _srcResolution.y,
-                 0, GL_RGB, GL_FLOAT, color.data());
-
-
-    glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferTonemappingId);
-
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferMipmapSumId);
-
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferMipmapBlurId);
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferPreprocessId);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferDenoiseId);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _colorBufferSrcId);
-
-    glDisable(GL_DEPTH_TEST);
-    glBindVertexArray(_vao);
-
-
-
-    // Denoise
+    render();
+}
+void Processor::denoiseThresholdChanged(double threshold)
+{
     _denoisePass->pushProgram();
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferDenoiseId);
-    glViewport(0, 0, _denoiseResolution.x, _denoiseResolution.y);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _denoisePass->setFloat("Threshold", threshold);
     _denoisePass->popProgram();
 
+    render();
+}
 
-    // Preprocessing
+void Processor::preExposureChanged(double exposure)
+{
     _preprocessPass->pushProgram();
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferPreprocessId);
-    glViewport(0, 0, _preprocessResolution.x, _preprocessResolution.y);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _preprocessPass->setFloat("PreExpose", exposure);
     _preprocessPass->popProgram();
-    glGenerateTextureMipmap(_colorBufferPreprocessId);
 
+    render();
+}
 
-    // Mipmap blur
-    _mipmapBlurPass->pushProgram();
-    glm::ivec2 lodDimensions = _mipmapBlurResolution;
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferMipmapBlurId);
-    for(int lod=0; lod < _mipmapLodCount; ++lod)
-    {
-        glFramebufferTexture2D(
-            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-            GL_TEXTURE_2D, _colorBufferMipmapBlurId, lod);
+void Processor::aberrationChanged(double aberration)
+{
+    _preprocessPass->pushProgram();
+    _preprocessPass->setFloat("Aberration", aberration);
+    _preprocessPass->popProgram();
 
-        glViewport(0, 0, lodDimensions.x, lodDimensions.y);
-        _mipmapBlurPass->setInt("CurrentLod", lod);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+    render();
+}
 
-        lodDimensions = glm::max(lodDimensions / 2, glm::ivec2(1));
-    }
-    _mipmapBlurPass->popProgram();
-
-
-    // Mipmap sum
+void Processor::relaxationChanged(double relaxation)
+{
     _mipmapSumPass->pushProgram();
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferMipmapSumId);
-    glViewport(0, 0, _mipmapSumResolution.x, _mipmapSumResolution.y);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _mipmapSumPass->setFloat("Relaxation", relaxation);
     _mipmapSumPass->popProgram();
 
+    render();
+}
 
-    // Tonemapping
+void Processor::postExposureChanged(double exposure)
+{
     _tonemappingPass->pushProgram();
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferTonemappingId);
-    glViewport(0, 0, _tonemappingResolution.x, _tonemappingResolution.y);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _tonemappingPass->setFloat("ExposureGain", exposure);
     _tonemappingPass->popProgram();
 
+    render();
+}
 
-    // Gammatize
+void Processor::bloomChanged(double bloom)
+{
+    _tonemappingPass->pushProgram();
+    _tonemappingPass->setFloat("BloomGain", bloom);
+    _tonemappingPass->popProgram();
+
+    render();
+}
+
+void Processor::gammaChanged(double gamma)
+{
     _gammatizePass->pushProgram();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, _gammatizeResolution.x, _gammatizeResolution.y);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _gammatizePass->setFloat("Gamma", gamma);
     _gammatizePass->popProgram();
-//*/
 
-
-    glBindVertexArray(0);
-    glEnable(GL_DEPTH_TEST);
-
-    GlToolkit::takeFramebufferShot(*_image);
-
-    swapBuffers();
+    render();
 }
 
 // QGLWidget interface
@@ -356,6 +321,108 @@ void Processor::resizeGL(int w, int h)
 void Processor::paintGL()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Processor::render()
+{
+    const std::vector<glm::vec3>& color =
+        _film->colorBuffer(Film::ColorOutput::ALBEDO);
+
+    glBindTexture(GL_TEXTURE_2D, _colorBufferSrcId);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, _srcResolution.x, _srcResolution.y,
+                 0, GL_RGB, GL_FLOAT, color.data());
+
+
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferTonemappingId);
+
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferMipmapSumId);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferMipmapBlurId);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferPreprocessId);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferDenoiseId);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, _colorBufferSrcId);
+
+    glDisable(GL_DEPTH_TEST);
+    glBindVertexArray(_vao);
+
+
+
+    // Denoise
+    _denoisePass->pushProgram();
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferDenoiseId);
+    glViewport(0, 0, _denoiseResolution.x, _denoiseResolution.y);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _denoisePass->popProgram();
+
+
+    // Preprocessing
+    _preprocessPass->pushProgram();
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferPreprocessId);
+    glViewport(0, 0, _preprocessResolution.x, _preprocessResolution.y);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _preprocessPass->popProgram();
+    glGenerateTextureMipmap(_colorBufferPreprocessId);
+
+
+    // Mipmap blur
+    _mipmapBlurPass->pushProgram();
+    glm::ivec2 lodDimensions = _mipmapBlurResolution;
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferMipmapBlurId);
+    for(int lod=0; lod < _mipmapLodCount; ++lod)
+    {
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+            GL_TEXTURE_2D, _colorBufferMipmapBlurId, lod);
+
+        glViewport(0, 0, lodDimensions.x, lodDimensions.y);
+        _mipmapBlurPass->setInt("CurrentLod", lod);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        lodDimensions = glm::max(lodDimensions / 2, glm::ivec2(1));
+    }
+    _mipmapBlurPass->popProgram();
+
+
+    // Mipmap sum
+    _mipmapSumPass->pushProgram();
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferMipmapSumId);
+    glViewport(0, 0, _mipmapSumResolution.x, _mipmapSumResolution.y);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _mipmapSumPass->popProgram();
+
+
+    // Tonemapping
+    _tonemappingPass->pushProgram();
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferTonemappingId);
+    glViewport(0, 0, _tonemappingResolution.x, _tonemappingResolution.y);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _tonemappingPass->popProgram();
+
+
+    // Gammatize
+    _gammatizePass->pushProgram();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, _gammatizeResolution.x, _gammatizeResolution.y);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    _gammatizePass->popProgram();
+//*/
+
+
+    glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST);
+
+    GlToolkit::takeFramebufferShot(*_image);
+
+    swapBuffers();
 }
 
 void Processor::genFramebuffer(
