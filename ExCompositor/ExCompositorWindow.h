@@ -49,6 +49,7 @@ protected:
 
     void play();
     void generate();
+    void renderFrame();
 
     void closeEvent(QCloseEvent* e);
 
@@ -60,6 +61,8 @@ private:
     QVBoxLayout* _sectionLayout;
     QPixmap* _currentPixmap;
     QLabel* _imageLabel;
+
+    int _currentFrame;
 };
 
 #endif // EXCOMPOSITORWINDOW_H

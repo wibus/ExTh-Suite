@@ -34,12 +34,16 @@ public:
 
     virtual std::shared_ptr<cellar::Image> yield() const;
 
+    std::map<std::string, double> shading;
+
 
 public slots:
     void denoiseThresholdChanged(double threshold);
     void preExposureChanged(double exposure);
     void aberrationChanged(double aberration);
     void relaxationChanged(double relaxation);
+    void tonePersistenceChanged(double persistence);
+    void bloomPersistenceChanged(double persistence);
     void postExposureChanged(double exposure);
     void bloomChanged(double bloom);
     void gammaChanged(double gamma);
@@ -74,6 +78,8 @@ private:
     glm::ivec2 _gammatizeResolution;
 
     int _mipmapLodCount;
+    float _tonePersistence;
+    float _bloomPersistence;
 
     std::shared_ptr<cellar::GlProgram> _denoisePass;
     std::shared_ptr<cellar::GlProgram> _preprocessPass;

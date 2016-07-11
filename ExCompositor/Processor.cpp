@@ -30,8 +30,9 @@ Processor::Processor(const glm::ivec2& srcResolution,
     QGLWidget(getGlFormat()),
     _srcResolution(srcResolution),
     _dstResolution(dstResolution),
-    _film(new ConvergentFilm()),
-    _image(new Image())
+    _tonePersistence(0.0),
+    _bloomPersistence(0.0),
+    shading()
 {
 
 }
@@ -52,12 +53,19 @@ bool Processor::feed(const std::string& filmName, bool useLastAsRef)
     {
         getLog().postMessage(new Message('E', false,
             "Film not found: " + filmName, "Processor"));
+
+        return false;
     }
 
     render();
+
+    return true;
 }
+
 void Processor::denoiseThresholdChanged(double threshold)
 {
+    shading["DenoiseThreshold"] = threshold;
+
     _denoisePass->pushProgram();
     _denoisePass->setFloat("Threshold", threshold);
     _denoisePass->popProgram();
@@ -67,6 +75,8 @@ void Processor::denoiseThresholdChanged(double threshold)
 
 void Processor::preExposureChanged(double exposure)
 {
+    shading["Pre-Exposure"] = exposure;
+
     _preprocessPass->pushProgram();
     _preprocessPass->setFloat("PreExpose", exposure);
     _preprocessPass->popProgram();
@@ -76,6 +86,8 @@ void Processor::preExposureChanged(double exposure)
 
 void Processor::aberrationChanged(double aberration)
 {
+    shading["Aberration"] = aberration;
+
     _preprocessPass->pushProgram();
     _preprocessPass->setFloat("Aberration", aberration);
     _preprocessPass->popProgram();
@@ -85,6 +97,8 @@ void Processor::aberrationChanged(double aberration)
 
 void Processor::relaxationChanged(double relaxation)
 {
+    shading["Relaxation"] = relaxation;
+
     _mipmapSumPass->pushProgram();
     _mipmapSumPass->setFloat("Relaxation", relaxation);
     _mipmapSumPass->popProgram();
@@ -92,8 +106,26 @@ void Processor::relaxationChanged(double relaxation)
     render();
 }
 
+void Processor::tonePersistenceChanged(double persistence)
+{
+    _tonePersistence = persistence;
+    shading["Tone-Persistence"] = persistence;
+
+    render();
+}
+
+void Processor::bloomPersistenceChanged(double persistence)
+{
+    _bloomPersistence = persistence;
+    shading["Bloom-Persistence"] = persistence;
+
+    render();
+}
+
 void Processor::postExposureChanged(double exposure)
 {
+    shading["Post-Exposure"] = exposure;
+
     _tonemappingPass->pushProgram();
     _tonemappingPass->setFloat("ExposureGain", exposure);
     _tonemappingPass->popProgram();
@@ -103,6 +135,8 @@ void Processor::postExposureChanged(double exposure)
 
 void Processor::bloomChanged(double bloom)
 {
+    shading["Bloom"] = bloom;
+
     _tonemappingPass->pushProgram();
     _tonemappingPass->setFloat("BloomGain", bloom);
     _tonemappingPass->popProgram();
@@ -112,6 +146,8 @@ void Processor::bloomChanged(double bloom)
 
 void Processor::gammaChanged(double gamma)
 {
+    shading["Gamma"] = gamma;
+
     _gammatizePass->pushProgram();
     _gammatizePass->setFloat("Gamma", gamma);
     _gammatizePass->popProgram();
@@ -122,6 +158,9 @@ void Processor::gammaChanged(double gamma)
 // QGLWidget interface
 void Processor::initializeGL()
 {
+    _film.reset(new ConvergentFilm());
+    _image.reset(new Image());
+
     if(gl3wInit() != 0)
     {
         getLog().postMessage(new Message('E', true,
@@ -231,7 +270,6 @@ void Processor::initializeGL()
     _denoisePass->link();
     _denoisePass->pushProgram();
     _denoisePass->setInt("Source", 0);
-    _denoisePass->setFloat("Threshold", 1.0f);
     _denoisePass->popProgram();
 
     _preprocessPass.reset(new GlProgram());
@@ -240,8 +278,6 @@ void Processor::initializeGL()
     _preprocessPass->link();
     _preprocessPass->pushProgram();
     _preprocessPass->setInt("Source", 1);
-    _preprocessPass->setFloat("PreExpose", 4.0f);
-    _preprocessPass->setFloat("Aberration", 0.1f);
     _preprocessPass->popProgram();
 
     _mipmapBlurPass.reset(new GlProgram());
@@ -260,7 +296,6 @@ void Processor::initializeGL()
     _mipmapSumPass->pushProgram();
     _mipmapSumPass->setInt("Source", 3);
     _mipmapSumPass->setInt("LodCount", _mipmapLodCount);
-    _mipmapSumPass->setFloat("Relaxation", 0.3f);
     _mipmapSumPass->popProgram();
 
     _tonemappingPass.reset(new GlProgram());
@@ -270,8 +305,6 @@ void Processor::initializeGL()
     _tonemappingPass->pushProgram();
     _tonemappingPass->setInt("Source", 2);
     _tonemappingPass->setInt("MipmapSum", 4);
-    _tonemappingPass->setFloat("ExposureGain", 0.16f);
-    _tonemappingPass->setFloat("BloomGain", 1.2f);
     _tonemappingPass->popProgram();
 
     _gammatizePass.reset(new GlProgram());
@@ -280,7 +313,6 @@ void Processor::initializeGL()
     _gammatizePass->link();
     _gammatizePass->pushProgram();
     _gammatizePass->setInt("Source", 5);
-    _gammatizePass->setFloat("Gamma", 2.0);
     _gammatizePass->popProgram();
 
 
@@ -375,20 +407,33 @@ void Processor::render()
 
     // Mipmap blur
     _mipmapBlurPass->pushProgram();
-    glm::ivec2 lodDimensions = _mipmapBlurResolution;
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBufferMipmapBlurId);
+
+    glEnable(GL_BLEND);
+    double tonePersist = _tonePersistence;
+    double bloomPersist = _bloomPersistence;
+    glBlendFunc(GL_ONE_MINUS_CONSTANT_COLOR, GL_CONSTANT_COLOR);
+    glm::ivec2 lodDimensions = _mipmapBlurResolution;
     for(int lod=0; lod < _mipmapLodCount; ++lod)
     {
         glFramebufferTexture2D(
             GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
             GL_TEXTURE_2D, _colorBufferMipmapBlurId, lod);
 
+        glBlendColor(bloomPersist, bloomPersist, bloomPersist, tonePersist);
+
         glViewport(0, 0, lodDimensions.x, lodDimensions.y);
         _mipmapBlurPass->setInt("CurrentLod", lod);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        tonePersist = 1.0 - glm::pow(1.0 - _tonePersistence, lod + 2.0);
+        bloomPersist = 1.0 - glm::pow(1.0 - _bloomPersistence, lod + 2.0);
         lodDimensions = glm::max(lodDimensions / 2, glm::ivec2(1));
     }
+    glDisable(GL_BLEND);
+
+
+
     _mipmapBlurPass->popProgram();
 
 
@@ -398,6 +443,7 @@ void Processor::render()
     glViewport(0, 0, _mipmapSumResolution.x, _mipmapSumResolution.y);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     _mipmapSumPass->popProgram();
+
 
 
     // Tonemapping

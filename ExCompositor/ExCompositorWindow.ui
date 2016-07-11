@@ -247,25 +247,81 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QScrollArea" name="imageScrollArea">
-        <property name="lineWidth">
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
          <number>0</number>
         </property>
-        <property name="widgetResizable">
-         <bool>true</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <widget class="QWidget" name="scrollAreaWidgetContents">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>1345</width>
-           <height>755</height>
-          </rect>
-         </property>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Output</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QScrollArea" name="outputScrollArea">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="lineWidth">
+             <number>0</number>
+            </property>
+            <property name="widgetResizable">
+             <bool>true</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <widget class="QWidget" name="outputScrollAreaWidgetContents">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>1302</width>
+               <height>703</height>
+              </rect>
+             </property>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Input</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QScrollArea" name="inputScrollArea">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="lineWidth">
+             <number>0</number>
+            </property>
+            <property name="widgetResizable">
+             <bool>true</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <widget class="QWidget" name="inputScrollAreaWidgetContents">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>1302</width>
+               <height>703</height>
+              </rect>
+             </property>
+            </widget>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>
@@ -353,7 +409,7 @@
             <double>0.010000000000000</double>
            </property>
            <property name="value">
-            <double>1.000000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -379,7 +435,7 @@
             <double>0.010000000000000</double>
            </property>
            <property name="value">
-            <double>4.000000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -396,7 +452,7 @@
             <double>0.010000000000000</double>
            </property>
            <property name="value">
-            <double>0.100000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -422,9 +478,42 @@
             <double>0.010000000000000</double>
            </property>
            <property name="value">
-            <double>0.300000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="tonePersistLabel">
+           <property name="text">
+            <string>Tone Persist</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="tonePersistSpin">
+           <property name="decimals">
+            <number>2</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="bloomPersistLabel">
+           <property name="text">
+            <string>Bloom Persist</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="bloomPersistSpin"/>
          </item>
         </layout>
        </widget>
@@ -454,7 +543,7 @@
             <double>0.010000000000000</double>
            </property>
            <property name="value">
-            <double>0.160000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -471,7 +560,7 @@
             <double>0.010000000000000</double>
            </property>
            <property name="value">
-            <double>1.200000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -494,7 +583,7 @@
          <item row="0" column="1">
           <widget class="QDoubleSpinBox" name="gammaSpin">
            <property name="minimum">
-            <double>0.010000000000000</double>
+            <double>0.000000000000000</double>
            </property>
            <property name="maximum">
             <double>9.990000000000000</double>
@@ -503,7 +592,7 @@
             <double>0.100000000000000</double>
            </property>
            <property name="value">
-            <double>2.000000000000000</double>
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>

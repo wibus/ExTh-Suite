@@ -30,7 +30,7 @@ void main()
         vec4 texel = textureLod(Source, texCoord, i);
 
         vec3 color = vec3(texel);
-        float colorWeight = 1.0 / (i + 1);
+        float colorWeight = sqrt(1.0 / (i + 1));
         colorSum += color * colorWeight;
         colorWeightSum += colorWeight;
 

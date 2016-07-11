@@ -15,13 +15,18 @@ Serializer::Serializer()
 
 }
 
-bool Serializer::write(const std::vector<std::shared_ptr<Section>>& sections, const QString& file)
+bool Serializer::write(
+        const std::vector<std::shared_ptr<Section>>& sections,
+        const std::map<string, double>& shading,
+        const QString& file)
 {
     QFile jsonFile(file);
     if(!jsonFile.open(QFile::WriteOnly))
         return false;
 
     QJsonDocument doc;
+
+    QJsonObject mainObj;
 
     QJsonArray array;
     for(shared_ptr<Section> s : sections)
@@ -39,13 +44,24 @@ bool Serializer::write(const std::vector<std::shared_ptr<Section>>& sections, co
         array.append(obj);
     }
 
-    doc.setArray(array);
+    mainObj["Sections"] = array;
+
+    QJsonObject shadingObj;
+    for(auto sh : shading)
+        shadingObj[sh.first.c_str()] = sh.second;
+
+    mainObj["Shading"] = shadingObj;
+
+    doc.setObject(mainObj);
     jsonFile.write(doc.toJson());
 
     return true;
 }
 
-bool Serializer::read(std::vector<std::shared_ptr<Section>>& sections, const QString& file)
+bool Serializer::read(
+        std::vector<std::shared_ptr<Section>>& sections,
+        std::map<std::string, double>& shading,
+        const QString& file)
 {
     QFile jsonFile(file);
     if(!jsonFile.open(QFile::ReadOnly | QFile::Text))
@@ -53,7 +69,9 @@ bool Serializer::read(std::vector<std::shared_ptr<Section>>& sections, const QSt
 
     QJsonDocument doc = QJsonDocument::fromJson(jsonFile.readAll());
 
-    QJsonArray array = doc.array();
+    QJsonObject mainObj = doc.object();
+
+    QJsonArray array = mainObj["Sections"].toArray();
     for(QJsonValueRef val : array)
     {
         QJsonObject obj = val.toObject();
@@ -68,6 +86,12 @@ bool Serializer::read(std::vector<std::shared_ptr<Section>>& sections, const QSt
         s->outColor = toColor(obj["out-color"]);
 
         sections.push_back(s);
+    }
+
+    QJsonObject shadingObj = mainObj["Shading"].toObject();
+    for(auto it = shadingObj.begin(); it != shadingObj.end(); ++it)
+    {
+        shading[it.key().toStdString()] = (*it).toDouble();
     }
 
     return true;

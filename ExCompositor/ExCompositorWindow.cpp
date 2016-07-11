@@ -34,11 +34,39 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    _imageLabel = new QLabel();
+    _imageLabel->setFixedSize(1280, 720);
+    ui->inputScrollArea->setWidget(_imageLabel);
+    _processor->setFixedSize(1280, 720);
+    ui->outputScrollArea->setWidget(_processor.get());
+
+    show();
+
     _sectionLayout = new QVBoxLayout();
     ui->sectionGroup->setLayout(_sectionLayout);
     _sectionLayout->addStretch();
 
-    _processor->show();
+
+    // Shading
+    connect(ui->denoiseThresholdSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::denoiseThresholdChanged);
+    connect(ui->preExposureSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::preExposureChanged);
+    connect(ui->aberrationSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::aberrationChanged);
+    connect(ui->relaxationSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::relaxationChanged);
+    connect(ui->tonePersistSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::tonePersistenceChanged);
+    connect(ui->bloomPersistSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::bloomPersistenceChanged);
+    connect(ui->postExposureSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::postExposureChanged);
+    connect(ui->bloomSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::bloomChanged);
+    connect(ui->gammaSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            _processor.get(), &Processor::gammaChanged);
+
 
     loadProject();
     _sections.front()->radio->setChecked(true);
@@ -63,35 +91,8 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
             this, &ExCompositorWindow::generate);
 
 
-    // Shading
-    connect(ui->denoiseThresholdSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            _processor.get(), &Processor::denoiseThresholdChanged);
-    connect(ui->preExposureSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            _processor.get(), &Processor::preExposureChanged);
-    connect(ui->aberrationSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            _processor.get(), &Processor::aberrationChanged);
-    connect(ui->relaxationSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            _processor.get(), &Processor::relaxationChanged);
-    connect(ui->postExposureSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            _processor.get(), &Processor::postExposureChanged);
-    connect(ui->bloomSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            _processor.get(), &Processor::bloomChanged);
-    connect(ui->gammaSpin, static_cast<void(QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            _processor.get(), &Processor::gammaChanged);
-
-    _processor->denoiseThresholdChanged(ui->denoiseThresholdSpin->value());
-    _processor->preExposureChanged(ui->preExposureSpin->value());
-    _processor->aberrationChanged(ui->aberrationSpin->value());
-    _processor->relaxationChanged(ui->relaxationSpin->value());
-    _processor->postExposureChanged(ui->postExposureSpin->value());
-    _processor->bloomChanged(ui->bloomSpin->value());
-    _processor->gammaChanged(ui->gammaSpin->value());
-
-
-    _imageLabel = new QLabel();
-    ui->imageScrollArea->setWidget(_imageLabel);
-
-    frameChanged(0);
+    _currentFrame = 0;
+    frameChanged(890);
 
     move(0, 0);
 }
@@ -108,86 +109,11 @@ void ExCompositorWindow::frameChanged(int frame)
     ui->timeLineMin->setValue((frame / 24.0)/60);
     ui->timeLineSec->setValue((frame / 24.0) - ui->timeLineMin->value()*60);
 
-    double time = frame/ 24.0;
-
-    shared_ptr<Section> section;
-    for(shared_ptr<Section> s : _sections)
+    if(frame != _currentFrame)
     {
-        if(time < s->fadeOutTime)
-        {
-            section = s;
-            break;
-        }
+        _currentFrame = frame;
+        renderFrame();
     }
-
-    if(section.get() == nullptr)
-        return;
-
-    delete _currentPixmap;
-    _currentPixmap = nullptr;
-    if(section->file != ANIMATION_FILE)
-    {
-        _currentPixmap = new QPixmap(ANIMATION_ROOT + "titles/"+section->file);
-    }
-    else
-    {
-        int animFirstFrame = section->beginingTime * 24;
-        int animFrame = frame - animFirstFrame;
-
-        if(animFrame > 0)
-        {
-            QStringList filters;
-            filters << QString("%1*").arg(animFrame, 4, 10, QChar('0'));
-
-            QDir dir(QDir::current());
-            dir.cd(ANIMATION_ROOT + "frames");
-            QStringList dirs = dir.entryList(filters);
-
-            if(dirs.size() > 0)
-            {
-                _currentPixmap = new QPixmap(ANIMATION_ROOT + "frames/"+dirs.at(0));
-            }
-            else
-            {
-                qDebug() << dir.absolutePath() << filters.at(0);
-                _currentPixmap = new QPixmap(1280, 720);
-            }
-
-            if(true)
-            {
-                QString filmName = ANIMATION_ROOT + "films/" +
-                    QString("%1").arg(animFrame, 4, 10, QChar('0'));
-                _processor->feed(filmName.toStdString(), true);
-            }
-        }
-        else
-        {
-            _currentPixmap = new QPixmap(1280, 720);
-        }
-    }
-
-    if(time < section->fadeInTime)
-    {
-        QPainter p(_currentPixmap);
-        p.setPen(QPen(section->inColor));
-        p.setBrush(QBrush(section->inColor));
-        p.setOpacity(1.0 - glm::smoothstep(section->beginingTime, section->fadeInTime, time));
-        p.drawRect(_currentPixmap->rect());
-    }
-    else if(time < section->durationTime)
-    {
-        //nothing
-    }
-    else if(time < section->fadeOutTime)
-    {
-        QPainter p(_currentPixmap);
-        p.setPen(QPen(section->outColor));
-        p.setBrush(QBrush(section->outColor));
-        p.setOpacity(glm::smoothstep(section->durationTime, section->fadeOutTime, time));
-        p.drawRect(_currentPixmap->rect());
-    }
-
-    _imageLabel->setPixmap(*_currentPixmap);
 }
 
 void ExCompositorWindow::sectionChaged(bool checked)
@@ -327,7 +253,8 @@ void ExCompositorWindow::loadProject()
 {
     _sections.clear();
     Serializer serializer;
-    serializer.read(_sections, ANIMATION_ROOT + COMPOSITION_FILE);
+    serializer.read(_sections, _processor->shading,
+                    ANIMATION_ROOT + COMPOSITION_FILE);
 
     while(!_sectionLayout->isEmpty())
     {
@@ -347,13 +274,24 @@ void ExCompositorWindow::loadProject()
 
     _sections.front()->radio->setChecked(true);
 
+    ui->denoiseThresholdSpin->setValue(_processor->shading["DenoiseThreshold"]);
+    ui->preExposureSpin->setValue(_processor->shading["Pre-Exposure"]);
+    ui->aberrationSpin->setValue(_processor->shading["Aberration"]);
+    ui->relaxationSpin->setValue(_processor->shading["Relaxation"]);
+    ui->tonePersistSpin->setValue(_processor->shading["Tone-Persistence"]);
+    ui->bloomPersistSpin->setValue(_processor->shading["Bloom-Persistence"]);
+    ui->postExposureSpin->setValue(_processor->shading["Post-Exposure"]);
+    ui->bloomSpin->setValue(_processor->shading["Bloom"]);
+    ui->gammaSpin->setValue(_processor->shading["Gamma"]);
+
     updateTimeLine();
 }
 
 void ExCompositorWindow::saveProject()
 {
     Serializer serializer;
-    serializer.write(_sections, ANIMATION_ROOT + COMPOSITION_FILE);
+    serializer.write(_sections, _processor->shading,
+                     ANIMATION_ROOT + COMPOSITION_FILE);
 }
 
 void ExCompositorWindow::addSection(QLayout* layout, Section& section)
@@ -381,7 +319,7 @@ void ExCompositorWindow::play()
     int frameCount = ui->frameSpin->maximum();
     for(int frame=start; frame <= frameCount; ++frame)
     {
-        frameChanged(frame);
+        ui->frameSpin->setValue(frame);
 
         QCoreApplication::processEvents();
 
@@ -400,7 +338,7 @@ void ExCompositorWindow::generate()
     int frameCount = ui->frameSpin->maximum();
     for(int frame=start; frame <= frameCount; ++frame)
     {
-        frameChanged(frame);
+        ui->frameSpin->setValue(frame);
 
         if(_currentPixmap)
         {
@@ -420,6 +358,90 @@ void ExCompositorWindow::generate()
     }
 
     ui->generateButton->setChecked(false);
+}
+
+void ExCompositorWindow::renderFrame()
+{
+    double time = _currentFrame/ 24.0;
+
+    shared_ptr<Section> section;
+    for(shared_ptr<Section> s : _sections)
+    {
+        if(time < s->fadeOutTime)
+        {
+            section = s;
+            break;
+        }
+    }
+
+    if(section.get() == nullptr)
+        return;
+
+    delete _currentPixmap;
+    _currentPixmap = nullptr;
+    if(section->file != ANIMATION_FILE)
+    {
+        _currentPixmap = new QPixmap(ANIMATION_ROOT + "titles/"+section->file);
+    }
+    else
+    {
+        int animFirstFrame = section->beginingTime * 24;
+        int animFrame = _currentFrame - animFirstFrame;
+
+        if(animFrame > 0)
+        {
+            QStringList filters;
+            filters << QString("%1*").arg(animFrame, 4, 10, QChar('0'));
+
+            QDir dir(QDir::current());
+            dir.cd(ANIMATION_ROOT + "frames");
+            QStringList dirs = dir.entryList(filters);
+
+            if(dirs.size() > 0)
+            {
+                _currentPixmap = new QPixmap(ANIMATION_ROOT + "frames/"+dirs.at(0));
+            }
+            else
+            {
+                qDebug() << dir.absolutePath() << filters.at(0);
+                _currentPixmap = new QPixmap(1280, 720);
+            }
+
+            if(true)
+            {
+                QString filmName = ANIMATION_ROOT + "films/" +
+                    QString("%1").arg(animFrame, 4, 10, QChar('0'));
+                _processor->feed(filmName.toStdString(), true);
+            }
+        }
+        else
+        {
+            _currentPixmap = new QPixmap(1280, 720);
+        }
+    }
+
+    if(time < section->fadeInTime)
+    {
+        QPainter p(_currentPixmap);
+        p.setPen(QPen(section->inColor));
+        p.setBrush(QBrush(section->inColor));
+        p.setOpacity(1.0 - glm::smoothstep(section->beginingTime, section->fadeInTime, time));
+        p.drawRect(_currentPixmap->rect());
+    }
+    else if(time < section->durationTime)
+    {
+        //nothing
+    }
+    else if(time < section->fadeOutTime)
+    {
+        QPainter p(_currentPixmap);
+        p.setPen(QPen(section->outColor));
+        p.setBrush(QBrush(section->outColor));
+        p.setOpacity(glm::smoothstep(section->durationTime, section->fadeOutTime, time));
+        p.drawRect(_currentPixmap->rect());
+    }
+
+    _imageLabel->setPixmap(*_currentPixmap);
 }
 
 void ExCompositorWindow::closeEvent(QCloseEvent* e)
