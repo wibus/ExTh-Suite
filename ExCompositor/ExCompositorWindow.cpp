@@ -12,12 +12,16 @@
 #include <QColorDialog>
 #include <QDebug>
 
+#include <CellarWorkbench/Image/Image.h>
+
 #include "Section.h"
 #include "Serializer.h"
 #include "Processor.h"
 
 using namespace std;
 
+const int OUTPUT_WIDTH = 1280;
+const int OUTPUT_HEIGHT = 720;
 
 const QString ANIMATION_ROOT = "Animations/The Fruit/";
 const QString ANIMATION_FILE = "[Animation]";
@@ -27,18 +31,25 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ExCompositorWindow),
     _processor(new Processor(glm::ivec2(1280, 720),
-                             glm::ivec2(1280, 720))),
+                             glm::ivec2(OUTPUT_WIDTH, OUTPUT_HEIGHT))),
     _currentSection(nullptr),
-    _imageLabel(nullptr),
-    _currentPixmap(nullptr)
+    _inputImageLabel(nullptr),
+    _sourcePixmap(nullptr),
+    _workingPixmap(OUTPUT_WIDTH, OUTPUT_HEIGHT),
+    _tmpImage(OUTPUT_WIDTH, OUTPUT_HEIGHT, QImage::Format_RGB888)
 {
     ui->setupUi(this);
 
-    _imageLabel = new QLabel();
-    _imageLabel->setFixedSize(1280, 720);
-    ui->inputScrollArea->setWidget(_imageLabel);
-    _processor->setFixedSize(1280, 720);
-    ui->outputScrollArea->setWidget(_processor.get());
+    _inputImageLabel = new QLabel();
+    _inputImageLabel->setFixedSize(OUTPUT_WIDTH, OUTPUT_HEIGHT);
+    ui->inputScrollArea->setWidget(_inputImageLabel);
+
+    _processor->setFixedSize(OUTPUT_WIDTH, OUTPUT_HEIGHT);
+    ui->postprocessingScrollArea->setWidget(_processor.get());
+
+    _outputImageLabel = new QLabel();
+    _outputImageLabel->setFixedSize(OUTPUT_WIDTH, OUTPUT_HEIGHT);
+    ui->outputScrollArea->setWidget(_outputImageLabel);
 
     show();
 
@@ -340,20 +351,17 @@ void ExCompositorWindow::generate()
     {
         ui->frameSpin->setValue(frame);
 
-        if(_currentPixmap)
+        QFile file(QString(ANIMATION_ROOT + "composites/%1.png")
+                   .arg(frame, 4, 10, QChar('0')));
+        file.open(QIODevice::WriteOnly);
+
+        _workingPixmap.save(&file, "PNG", 80);
+
+        QCoreApplication::processEvents();
+
+        if(!ui->generateButton->isChecked())
         {
-            QFile file(QString(ANIMATION_ROOT + "composites/%1.png")
-                       .arg(frame, 4, 10, QChar('0')));
-            file.open(QIODevice::WriteOnly);
-
-            _currentPixmap->save(&file, "PNG", 80);
-
-            QCoreApplication::processEvents();
-
-            if(!ui->generateButton->isChecked())
-            {
-                break;
-            }
+            break;
         }
     }
 
@@ -377,14 +385,28 @@ void ExCompositorWindow::renderFrame()
     if(section.get() == nullptr)
         return;
 
-    delete _currentPixmap;
-    _currentPixmap = nullptr;
+
     if(section->file != ANIMATION_FILE)
     {
-        _currentPixmap = new QPixmap(ANIMATION_ROOT + "titles/"+section->file);
+        QString pixmapName = ANIMATION_ROOT + "titles/"+section->file;
+
+        if(pixmapName != _currentPixmapName)
+        {
+            delete _sourcePixmap;
+            _sourcePixmap = nullptr;
+
+            _currentPixmapName = pixmapName;
+            _sourcePixmap = new QPixmap(pixmapName);
+        }
+
+        _workingPixmap = _sourcePixmap->copy();
     }
     else
-    {
+    {        
+        delete _sourcePixmap;
+        _sourcePixmap = nullptr;
+        _currentPixmapName = "";
+
         int animFirstFrame = section->beginingTime * 24;
         int animFrame = _currentFrame - animFirstFrame;
 
@@ -399,34 +421,51 @@ void ExCompositorWindow::renderFrame()
 
             if(dirs.size() > 0)
             {
-                _currentPixmap = new QPixmap(ANIMATION_ROOT + "frames/"+dirs.at(0));
+                _sourcePixmap = new QPixmap(ANIMATION_ROOT + "frames/"+dirs.at(0));
             }
             else
             {
                 qDebug() << dir.absolutePath() << filters.at(0);
-                _currentPixmap = new QPixmap(1280, 720);
+                _sourcePixmap = new QPixmap(OUTPUT_WIDTH, OUTPUT_HEIGHT);
             }
 
-            if(true)
+            QString filmName = ANIMATION_ROOT + "films/" +
+                QString("%1").arg(animFrame, 4, 10, QChar('0'));
+            _processor->feed(filmName.toStdString(), true);
+
+            std::shared_ptr<cellar::Image> img = _processor->yield();
+
+            unsigned char* pixels = img->pixels();
+            for(int j=0; j < OUTPUT_HEIGHT; ++j)
             {
-                QString filmName = ANIMATION_ROOT + "films/" +
-                    QString("%1").arg(animFrame, 4, 10, QChar('0'));
-                _processor->feed(filmName.toStdString(), true);
+                for(int i=0; i < OUTPUT_WIDTH; ++i)
+                {
+                    int inIdx = ((OUTPUT_HEIGHT-j-1)*OUTPUT_WIDTH + i)*4;
+
+                    _tmpImage.setPixelColor(i, j,
+                        QColor(pixels[inIdx+0],
+                               pixels[inIdx+1],
+                               pixels[inIdx+2]));
+                }
             }
+
+            _workingPixmap = QPixmap::fromImage(_tmpImage);
         }
         else
         {
-            _currentPixmap = new QPixmap(1280, 720);
+            _sourcePixmap = new QPixmap(OUTPUT_WIDTH, OUTPUT_HEIGHT);
+            _workingPixmap = _sourcePixmap->copy();
         }
     }
 
+
     if(time < section->fadeInTime)
     {
-        QPainter p(_currentPixmap);
+        QPainter p(&_workingPixmap);
         p.setPen(QPen(section->inColor));
         p.setBrush(QBrush(section->inColor));
         p.setOpacity(1.0 - glm::smoothstep(section->beginingTime, section->fadeInTime, time));
-        p.drawRect(_currentPixmap->rect());
+        p.drawRect(_workingPixmap.rect());
     }
     else if(time < section->durationTime)
     {
@@ -434,14 +473,15 @@ void ExCompositorWindow::renderFrame()
     }
     else if(time < section->fadeOutTime)
     {
-        QPainter p(_currentPixmap);
+        QPainter p(&_workingPixmap);
         p.setPen(QPen(section->outColor));
         p.setBrush(QBrush(section->outColor));
         p.setOpacity(glm::smoothstep(section->durationTime, section->fadeOutTime, time));
-        p.drawRect(_currentPixmap->rect());
+        p.drawRect(_workingPixmap.rect());
     }
 
-    _imageLabel->setPixmap(*_currentPixmap);
+    _inputImageLabel->setPixmap(*_sourcePixmap);
+    _outputImageLabel->setPixmap(_workingPixmap);
 }
 
 void ExCompositorWindow::closeEvent(QCloseEvent* e)

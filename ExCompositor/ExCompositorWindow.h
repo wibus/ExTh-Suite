@@ -59,8 +59,12 @@ private:
     std::vector<std::shared_ptr<Section>> _sections;
     std::shared_ptr<Section> _currentSection;
     QVBoxLayout* _sectionLayout;
-    QPixmap* _currentPixmap;
-    QLabel* _imageLabel;
+    QLabel* _inputImageLabel;
+    QLabel* _outputImageLabel;
+    QPixmap* _sourcePixmap;
+    QPixmap _workingPixmap;
+    QImage _tmpImage;
+    QString _currentPixmapName;
 
     int _currentFrame;
 };
