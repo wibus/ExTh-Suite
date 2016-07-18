@@ -7,7 +7,7 @@ install_manifest.txt
 *.user
 
 # Animations
-frames
+frames*
 films*
 titles*
 composites

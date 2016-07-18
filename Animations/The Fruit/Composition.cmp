@@ -22,9 +22,9 @@
             "File": "01 - Directed by.png",
             "Name": "Directed by",
             "begining": 12.048,
-            "duration": 17.164999999999999,
+            "duration": 17,
             "fade-in": 13.102,
-            "fade-out": 18.344000000000001,
+            "fade-out": 19,
             "in-color": [
                 255,
                 255,
@@ -39,10 +39,10 @@
         {
             "File": "02 - Music by.png",
             "Name": "Music by",
-            "begining": 18.344000000000001,
-            "duration": 22.399999999999999,
-            "fade-in": 19.344000000000001,
-            "fade-out": 23.399999999999999,
+            "begining": 19,
+            "duration": 19,
+            "fade-in": 19,
+            "fade-out": 19,
             "in-color": [
                 255,
                 255,
@@ -57,9 +57,9 @@
         {
             "File": "03 - Prologue.png",
             "Name": "Prologue",
-            "begining": 23.777999999999999,
+            "begining": 19.5,
             "duration": 34.515000000000001,
-            "fade-in": 24.800000000000001,
+            "fade-in": 20.5,
             "fade-out": 35.566000000000003,
             "in-color": [
                 255,
@@ -77,7 +77,7 @@
             "Name": "[Animation]",
             "begining": 37.079999999999998,
             "duration": 132,
-            "fade-in": 38.549999999999997,
+            "fade-in": 37.549999999999997,
             "fade-out": 134.08000000000001,
             "in-color": [
                 255,
@@ -147,13 +147,13 @@
     ],
     "Shading": {
         "Aberration": 0.14999999999999999,
-        "Bloom": 1,
+        "Bloom": 0.59999999999999998,
         "Bloom-Persistence": 0.10000000000000001,
         "DenoiseThreshold": 0.5,
         "Gamma": 2,
-        "Post-Exposure": 0.20000000000000001,
+        "Post-Exposure": 0.23999999999999999,
         "Pre-Exposure": 4,
         "Relaxation": 0.29999999999999999,
-        "Tone-Persistence": 0.40000000000000002
+        "Tone-Persistence": 0.45000000000000001
     }
 }
