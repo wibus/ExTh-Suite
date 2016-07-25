@@ -61,10 +61,8 @@ private:
     QVBoxLayout* _sectionLayout;
     QLabel* _inputImageLabel;
     QLabel* _outputImageLabel;
-    QPixmap* _sourcePixmap;
     QPixmap _workingPixmap;
     QImage _tmpImage;
-    QString _currentPixmapName;
 
     int _currentFrame;
 };

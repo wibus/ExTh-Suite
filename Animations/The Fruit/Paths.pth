@@ -1416,9 +1416,62 @@
         "Paths": [
             {
                 "CtrlPts": [
+                    15,
+                    5.0
+                ],
+                "Duration": 0.92,
+                "Type": "LinearPath"
+            },
+            {
+                "CtrlPts": [
+                    5
+                ],
+                "Duration": 3.25,
+                "Type": "PointPath"
+            },
+            {
+                "CtrlPts": [
+                    5,
                     15
                 ],
-                "Duration": 29.329999999999998,
+                "Duration": 2.29,
+                "Type": "LinearPath"
+            },
+            {
+                "CtrlPts": [
+                    15
+                ],
+                "Duration": 7.87,
+                "Type": "PointPath"
+            },
+            {
+                "CtrlPts": [
+                    15,
+                    7.5
+                ],
+                "Duration": 2.42,
+                "Type": "LinearPath"
+            },
+            {
+                "CtrlPts": [
+                    7.5
+                ],
+                "Duration": 5.17,
+                "Type": "PointPath"
+            },
+            {
+                "CtrlPts": [
+                    7.5,
+                    15
+                ],
+                "Duration": 2.25,
+                "Type": "LinearPath"
+            },
+            {
+                "CtrlPts": [
+                    15
+                ],
+                "Duration": 5.16,
                 "Type": "PointPath"
             },
             {

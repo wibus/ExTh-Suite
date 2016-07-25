@@ -41,7 +41,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="cameraTab">
          <attribute name="title">
@@ -149,7 +149,7 @@
                       <number>3840</number>
                      </property>
                      <property name="value">
-                      <number>1280</number>
+                      <number>1920</number>
                      </property>
                     </widget>
                    </item>
@@ -165,7 +165,7 @@
                       <number>2160</number>
                      </property>
                      <property name="value">
-                      <number>720</number>
+                      <number>1080</number>
                      </property>
                     </widget>
                    </item>
@@ -505,7 +505,7 @@
              <item row="0" column="1">
               <widget class="QLineEdit" name="animNameEdit">
                <property name="text">
-                <string>frames_pimp</string>
+                <string>frames</string>
                </property>
               </widget>
              </item>
@@ -525,7 +525,7 @@
                 <string>Sample count</string>
                </property>
                <property name="checked">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -535,7 +535,7 @@
                 <string>Render time</string>
                </property>
                <property name="checked">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
               </widget>
              </item>
@@ -545,7 +545,7 @@
                 <string>Divergence</string>
                </property>
                <property name="checked">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
               </widget>
              </item>

@@ -20,8 +20,8 @@
 
 using namespace std;
 
-const int OUTPUT_WIDTH = 1280;
-const int OUTPUT_HEIGHT = 720;
+const int OUTPUT_WIDTH = 1920;
+const int OUTPUT_HEIGHT = 1080;
 
 const QString ANIMATION_ROOT = "Animations/The Fruit/";
 const QString ANIMATION_FILE = "[Animation]";
@@ -34,13 +34,13 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
                              glm::ivec2(OUTPUT_WIDTH, OUTPUT_HEIGHT))),
     _currentSection(nullptr),
     _inputImageLabel(nullptr),
-    _sourcePixmap(nullptr),
     _workingPixmap(OUTPUT_WIDTH, OUTPUT_HEIGHT),
     _tmpImage(OUTPUT_WIDTH, OUTPUT_HEIGHT, QImage::Format_RGB888)
 {
     ui->setupUi(this);
 
     _inputImageLabel = new QLabel();
+    _inputImageLabel->setScaledContents(true);
     _inputImageLabel->setFixedSize(OUTPUT_WIDTH, OUTPUT_HEIGHT);
     ui->inputScrollArea->setWidget(_inputImageLabel);
 
@@ -48,6 +48,7 @@ ExCompositorWindow::ExCompositorWindow(QWidget *parent) :
     ui->postprocessingScrollArea->setWidget(_processor.get());
 
     _outputImageLabel = new QLabel();
+    _outputImageLabel->setScaledContents(true);
     _outputImageLabel->setFixedSize(OUTPUT_WIDTH, OUTPUT_HEIGHT);
     ui->outputScrollArea->setWidget(_outputImageLabel);
 
@@ -312,6 +313,15 @@ void ExCompositorWindow::addSection(QLayout* layout, Section& section)
 
     connect(section.radio, &QRadioButton::toggled,
             this, &ExCompositorWindow::sectionChaged);
+
+    if(section.file != ANIMATION_FILE)
+    {
+        section.pixmap.load(ANIMATION_ROOT + "titles/"+ section.file);
+    }
+    else
+    {
+        section.pixmap = QPixmap(OUTPUT_WIDTH, OUTPUT_HEIGHT);
+    }
 }
 
 void ExCompositorWindow::updateTimeLine()
@@ -373,11 +383,23 @@ void ExCompositorWindow::renderFrame()
     double time = _currentFrame/ 24.0;
 
     shared_ptr<Section> section;
-    for(shared_ptr<Section> s : _sections)
+    shared_ptr<Section> nextSect;
+    for(int i=0; i < _sections.size(); ++i)
     {
+        auto s = _sections[i];
         if(time < s->fadeOutTime)
         {
             section = s;
+
+            if(i < _sections.size() - 1)
+            {
+                auto n = _sections[i+1];
+                if(time > n->beginingTime)
+                {
+                    nextSect = n;
+                }
+            }
+
             break;
         }
     }
@@ -388,25 +410,10 @@ void ExCompositorWindow::renderFrame()
 
     if(section->file != ANIMATION_FILE)
     {
-        QString pixmapName = ANIMATION_ROOT + "titles/"+section->file;
-
-        if(pixmapName != _currentPixmapName)
-        {
-            delete _sourcePixmap;
-            _sourcePixmap = nullptr;
-
-            _currentPixmapName = pixmapName;
-            _sourcePixmap = new QPixmap(pixmapName);
-        }
-
-        _workingPixmap = _sourcePixmap->copy();
+        _workingPixmap = section->pixmap;
     }
     else
-    {        
-        delete _sourcePixmap;
-        _sourcePixmap = nullptr;
-        _currentPixmapName = "";
-
+    {
         int animFirstFrame = section->beginingTime * 24;
         int animFrame = _currentFrame - animFirstFrame;
 
@@ -416,17 +423,17 @@ void ExCompositorWindow::renderFrame()
             filters << QString("%1*").arg(animFrame, 4, 10, QChar('0'));
 
             QDir dir(QDir::current());
-            dir.cd(ANIMATION_ROOT + "frames");
+            dir.cd(ANIMATION_ROOT + "frames_back");
             QStringList dirs = dir.entryList(filters);
 
             if(dirs.size() > 0)
             {
-                _sourcePixmap = new QPixmap(ANIMATION_ROOT + "frames/"+dirs.at(0));
+                section->pixmap.load(ANIMATION_ROOT + "frames_back/" + dirs.at(0));
             }
             else
             {
                 qDebug() << dir.absolutePath() << filters.at(0);
-                _sourcePixmap = new QPixmap(OUTPUT_WIDTH, OUTPUT_HEIGHT);
+                section->pixmap.fill(Qt::white);
             }
 
             QString filmName = ANIMATION_ROOT + "films/" +
@@ -453,8 +460,7 @@ void ExCompositorWindow::renderFrame()
         }
         else
         {
-            _sourcePixmap = new QPixmap(OUTPUT_WIDTH, OUTPUT_HEIGHT);
-            _workingPixmap = _sourcePixmap->copy();
+            _workingPixmap.fill();
         }
     }
 
@@ -480,7 +486,14 @@ void ExCompositorWindow::renderFrame()
         p.drawRect(_workingPixmap.rect());
     }
 
-    _inputImageLabel->setPixmap(*_sourcePixmap);
+    if(nextSect.get() != nullptr)
+    {
+        QPainter p(&_workingPixmap);
+        p.setOpacity(glm::smoothstep(nextSect->beginingTime, nextSect->fadeInTime, time));
+        p.drawPixmap(0, 0, OUTPUT_WIDTH, OUTPUT_HEIGHT, nextSect->pixmap);
+    }
+
+    _inputImageLabel->setPixmap(section->pixmap);
     _outputImageLabel->setPixmap(_workingPixmap);
 }
 
